@@ -40,6 +40,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
+    // Keycloak
+    implementation("org.keycloak:keycloak-admin-client:26.0.0")
+
     // Database
     runtimeOnly("org.postgresql:postgresql")
 
