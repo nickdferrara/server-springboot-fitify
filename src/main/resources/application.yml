@@ -36,5 +36,12 @@ management:
       probes:
         enabled: true
 
+fitify:
+  keycloak:
+    server-url: http://localhost:8180
+    realm: fitify
+    client-id: fitify-api
+    client-secret: change-me
+
 server:
   port: 8080

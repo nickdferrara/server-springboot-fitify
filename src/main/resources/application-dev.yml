@@ -9,6 +9,13 @@ spring:
       minimum-idle: 5
       maximum-pool-size: 10
 
+fitify:
+  keycloak:
+    server-url: http://localhost:8180
+    realm: fitify
+    client-id: fitify-api
+    client-secret: dev-secret
+
 logging:
   level:
     com.nickdferrara.fitify: DEBUG
