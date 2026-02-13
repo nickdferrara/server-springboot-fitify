@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  datasource:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 10
+
+logging:
+  level:
+    com.nickdferrara.fitify: DEBUG
+    org.springframework.modulith: DEBUG
