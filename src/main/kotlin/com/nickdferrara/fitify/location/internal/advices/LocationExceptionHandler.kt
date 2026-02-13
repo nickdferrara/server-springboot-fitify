@@ -1,5 +1,7 @@
-package com.nickdferrara.fitify.location.internal.controller
+package com.nickdferrara.fitify.location.internal.advices
 
+import com.nickdferrara.fitify.location.internal.controller.AdminLocationController
+import com.nickdferrara.fitify.location.internal.controller.LocationController
 import com.nickdferrara.fitify.location.internal.dtos.response.ErrorResponse
 import com.nickdferrara.fitify.location.internal.service.LocationNotFoundException
 import org.springframework.http.HttpStatus
