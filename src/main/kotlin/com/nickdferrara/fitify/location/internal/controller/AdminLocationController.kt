@@ -1,5 +1,9 @@
-package com.nickdferrara.fitify.location.internal
+package com.nickdferrara.fitify.location.internal.controller
 
+import com.nickdferrara.fitify.location.internal.dtos.request.CreateLocationRequest
+import com.nickdferrara.fitify.location.internal.dtos.request.UpdateLocationRequest
+import com.nickdferrara.fitify.location.internal.dtos.response.LocationResponse
+import com.nickdferrara.fitify.location.internal.service.LocationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping

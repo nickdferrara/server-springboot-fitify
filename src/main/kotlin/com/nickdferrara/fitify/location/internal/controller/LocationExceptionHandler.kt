@@ -1,5 +1,7 @@
-package com.nickdferrara.fitify.location.internal
+package com.nickdferrara.fitify.location.internal.controller
 
+import com.nickdferrara.fitify.location.internal.dtos.response.ErrorResponse
+import com.nickdferrara.fitify.location.internal.service.LocationNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -14,5 +16,3 @@ internal class LocationExceptionHandler {
             .body(ErrorResponse(ex.message ?: "Location not found"))
     }
 }
-
-internal data class ErrorResponse(val message: String)
