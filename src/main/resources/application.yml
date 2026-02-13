@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: fitify
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fitify
+    username: fitify
+    password: fitify
+    hikari:
+      minimum-idle: 20
+      maximum-pool-size: 50
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/fitify
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+server:
+  port: 8080

@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fitify-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fitify}
+      POSTGRES_USER: ${POSTGRES_USER:-fitify}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fitify}
+    ports:
+      - "5432:5432"
+    volumes:
+      - fitify-pgdata:/var/lib/postgresql/data
+    networks:
+      - fitify-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fitify}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: fitify-keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fitify}
+      KC_DB_USERNAME: ${POSTGRES_USER:-fitify}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-fitify}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HTTP_PORT: 8180
+    ports:
+      - "8180:8180"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fitify-network
+
+  fitify-app:
+    build: .
+    container_name: fitify-app
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fitify}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-fitify}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-fitify}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/fitify
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    networks:
+      - fitify-network
+
+volumes:
+  fitify-pgdata:
+
+networks:
+  fitify-network:
+    driver: bridge
