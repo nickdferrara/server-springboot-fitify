@@ -1,4 +1,4 @@
-package com.nickdferrara.fitify.location.internal.controller.advices
+package com.nickdferrara.fitify.location.internal.advices
 
 import com.nickdferrara.fitify.location.internal.controller.AdminLocationController
 import com.nickdferrara.fitify.location.internal.controller.LocationController
