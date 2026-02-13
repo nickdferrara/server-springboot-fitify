@@ -1,5 +1,6 @@
-package com.nickdferrara.fitify.location.internal
+package com.nickdferrara.fitify.location.internal.repository
 
+import com.nickdferrara.fitify.location.internal.entities.Location
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package com.nickdferrara.fitify.location.internal
+package com.nickdferrara.fitify.location.internal.entities
 
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
