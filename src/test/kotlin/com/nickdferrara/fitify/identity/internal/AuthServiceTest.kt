@@ -35,7 +35,8 @@ class AuthServiceTest {
     private val passwordResetTokenRepository = mockk<PasswordResetTokenRepository>()
     private val keycloakClient = mockk<KeycloakClient>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
-    private val authService = AuthService(userRepository, passwordResetTokenRepository, keycloakClient, eventPublisher)
+    private val tokenPepper = "test-pepper"
+    private val authService = AuthService(userRepository, passwordResetTokenRepository, keycloakClient, eventPublisher, tokenPepper)
 
     private fun buildUser(
         id: UUID = UUID.randomUUID(),
@@ -142,6 +143,7 @@ class AuthServiceTest {
     fun `forgotPassword creates token and publishes event when user exists`() {
         val user = buildUser()
         every { userRepository.findByEmail(user.email) } returns Optional.of(user)
+        every { passwordResetTokenRepository.countByUserIdAndCreatedAtAfter(user.id!!, any()) } returns 0L
         every { passwordResetTokenRepository.save(any()) } answers { firstArg() }
 
         val response = authService.forgotPassword(ForgotPasswordRequest(user.email))

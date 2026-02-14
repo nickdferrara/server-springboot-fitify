@@ -22,12 +22,12 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@PreAuthorize("hasRole('ADMIN')")
 internal class AdminClassController(
     private val adminService: AdminService,
 ) {
 
     @PostMapping("/locations/{locationId}/classes")
+    @PreAuthorize("@locationAdminService.hasAccess(authentication, #locationId)")
     fun createClass(
         @PathVariable locationId: UUID,
         @RequestBody request: CreateClassRequest,
@@ -37,6 +37,7 @@ internal class AdminClassController(
     }
 
     @GetMapping("/locations/{locationId}/classes")
+    @PreAuthorize("@locationAdminService.hasAccess(authentication, #locationId)")
     fun listClassesByLocation(
         @PathVariable locationId: UUID,
     ): ResponseEntity<List<AdminClassResponse>> {
@@ -44,6 +45,7 @@ internal class AdminClassController(
     }
 
     @PutMapping("/classes/{classId}")
+    @PreAuthorize("hasRole('ADMIN')")
     fun updateClass(
         @PathVariable classId: UUID,
         @RequestBody request: UpdateClassRequest,
@@ -52,12 +54,14 @@ internal class AdminClassController(
     }
 
     @DeleteMapping("/classes/{classId}")
+    @PreAuthorize("hasRole('ADMIN')")
     fun cancelClass(@PathVariable classId: UUID): ResponseEntity<CancelClassResponse> {
         val response = adminService.cancelClass(classId)
         return ResponseEntity.ok(response)
     }
 
     @PostMapping("/locations/{locationId}/classes/recurring")
+    @PreAuthorize("@locationAdminService.hasAccess(authentication, #locationId)")
     fun createRecurringSchedule(
         @PathVariable locationId: UUID,
         @RequestBody request: CreateRecurringScheduleRequest,

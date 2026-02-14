@@ -10,6 +10,10 @@ spring:
       maximum-pool-size: 10
 
 fitify:
+  encryption:
+    key: dGVzdC1rZXktMzItYnl0ZXMtbG9uZy4u
+  security:
+    token-pepper: dev-pepper-value
   notification:
     from-email: noreply@fitify.local
     from-name: Fitify Dev

@@ -15,6 +15,7 @@ import com.nickdferrara.fitify.identity.internal.exception.InvalidTokenException
 import com.nickdferrara.fitify.identity.internal.exception.WeakPasswordException
 import com.nickdferrara.fitify.identity.internal.repository.PasswordResetTokenRepository
 import com.nickdferrara.fitify.identity.internal.repository.UserRepository
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,6 +31,7 @@ internal class AuthService(
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val keycloakClient: KeycloakClient,
     private val eventPublisher: ApplicationEventPublisher,
+    @Value("\${fitify.security.token-pepper}") private val tokenPepper: String,
 ) {
 
     companion object {
@@ -81,6 +83,14 @@ internal class AuthService(
     fun forgotPassword(request: ForgotPasswordRequest): MessageResponse {
         val user = userRepository.findByEmail(request.email).orElse(null)
             ?: return MessageResponse("If an account exists with that email, a reset link has been sent.")
+
+        val recentCount = passwordResetTokenRepository.countByUserIdAndCreatedAtAfter(
+            user.id!!,
+            Instant.now().minus(1, ChronoUnit.HOURS),
+        )
+        if (recentCount >= 3) {
+            return MessageResponse("If an account exists with that email, a reset link has been sent.")
+        }
 
         val rawToken = generateToken()
         val tokenHash = hashToken(rawToken)
@@ -147,7 +157,7 @@ internal class AuthService(
 
     private fun hashToken(token: String): String {
         val digest = MessageDigest.getInstance("SHA-256")
-        val hash = digest.digest(token.toByteArray())
+        val hash = digest.digest("$tokenPepper$token".toByteArray())
         return Base64.getUrlEncoder().withoutPadding().encodeToString(hash)
     }
 }

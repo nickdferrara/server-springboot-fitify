@@ -43,6 +43,15 @@ management:
         enabled: true
 
 fitify:
+  encryption:
+    key: ${ENCRYPTION_KEY:dGVzdC1rZXktMzItYnl0ZXMtbG9uZy4u}
+  security:
+    token-pepper: ${TOKEN_PEPPER:dev-pepper-value-change-in-prod}
+  rate-limit:
+    auth-requests-per-minute: 5
+    password-reset-per-hour: 3
+    general-requests-per-minute: 100
+    admin-requests-per-minute: 200
   notification:
     from-email: ${NOTIFICATION_FROM_EMAIL:noreply@fitify.com}
     from-name: ${NOTIFICATION_FROM_NAME:Fitify}

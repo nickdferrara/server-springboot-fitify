@@ -27,7 +27,7 @@ internal class SecurityConfig {
                 it.requestMatchers("/api/v1/auth/**").permitAll()
                 it.requestMatchers("/api/v1/webhooks/**").permitAll()
                 it.requestMatchers("/actuator/health/**").permitAll()
-                it.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                it.requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN", "LOCATION_ADMIN")
                 it.anyRequest().authenticated()
             }
             .oauth2ResourceServer {

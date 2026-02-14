@@ -1,6 +1,9 @@
 package com.nickdferrara.fitify.identity.internal.entities
 
+import com.nickdferrara.fitify.shared.crypto.DeterministicEncryptedStringConverter
+import com.nickdferrara.fitify.shared.crypto.NonDeterministicEncryptedStringConverter
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -23,12 +26,15 @@ internal class User(
     @Column(name = "keycloak_id", unique = true, nullable = false)
     val keycloakId: String,
 
+    @Convert(converter = DeterministicEncryptedStringConverter::class)
     @Column(unique = true, nullable = false)
     var email: String,
 
+    @Convert(converter = NonDeterministicEncryptedStringConverter::class)
     @Column(name = "first_name", nullable = false)
     var firstName: String,
 
+    @Convert(converter = NonDeterministicEncryptedStringConverter::class)
     @Column(name = "last_name", nullable = false)
     var lastName: String,
 

@@ -1,0 +1,8 @@
+package com.nickdferrara.fitify.shared.crypto
+
+import org.springframework.boot.context.properties.ConfigurationProperties
+
+@ConfigurationProperties(prefix = "fitify.encryption")
+data class EncryptionProperties(
+    val key: String,
+)
