@@ -1,19 +1,26 @@
 package com.nickdferrara.fitify.admin.internal
 
 import com.nickdferrara.fitify.admin.AdminApi
+import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateClassRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateRecurringScheduleRequest
+import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateBusinessRuleRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateClassRequest
 import com.nickdferrara.fitify.admin.internal.dtos.response.AdminClassResponse
+import com.nickdferrara.fitify.admin.internal.dtos.response.BusinessRuleResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.CancelClassResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.RecurringScheduleResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.toAdminResponse
+import com.nickdferrara.fitify.admin.internal.dtos.response.toResponse
+import com.nickdferrara.fitify.admin.internal.entities.BusinessRule
 import com.nickdferrara.fitify.admin.internal.entities.RecurringSchedule
+import com.nickdferrara.fitify.admin.internal.exceptions.BusinessRuleNotFoundException
 import com.nickdferrara.fitify.admin.internal.exceptions.ClassNotFoundException
 import com.nickdferrara.fitify.admin.internal.exceptions.CoachNotFoundException
 import com.nickdferrara.fitify.admin.internal.exceptions.CoachScheduleConflictException
 import com.nickdferrara.fitify.admin.internal.exceptions.InvalidRecurringScheduleException
 import com.nickdferrara.fitify.admin.internal.exceptions.LocationNotFoundException
+import com.nickdferrara.fitify.admin.internal.repository.BusinessRuleRepository
 import com.nickdferrara.fitify.admin.internal.repository.RecurringScheduleRepository
 import com.nickdferrara.fitify.coaching.CoachingApi
 import com.nickdferrara.fitify.location.LocationApi
@@ -21,6 +28,7 @@ import com.nickdferrara.fitify.scheduling.CreateClassCommand
 import com.nickdferrara.fitify.scheduling.SchedulingApi
 import com.nickdferrara.fitify.scheduling.UpdateClassCommand
 import com.nickdferrara.fitify.shared.Result
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
@@ -33,6 +41,8 @@ internal class AdminService(
     private val coachingApi: CoachingApi,
     private val locationApi: LocationApi,
     private val recurringScheduleRepository: RecurringScheduleRepository,
+    private val businessRuleRepository: BusinessRuleRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : AdminApi {
 
     fun createClass(locationId: UUID, request: CreateClassRequest): AdminClassResponse {
@@ -185,6 +195,64 @@ internal class AdminService(
             endDate = savedSchedule.endDate,
             classesCreated = classesCreated,
         )
+    }
+
+    // --- Business Rule methods ---
+
+    override fun getBusinessRuleValue(ruleKey: String, locationId: UUID?): String? {
+        if (locationId != null) {
+            val override = businessRuleRepository.findByRuleKeyAndLocationId(ruleKey, locationId)
+            if (override != null) return override.value
+        }
+        return businessRuleRepository.findByRuleKeyAndLocationIdIsNull(ruleKey)?.value
+    }
+
+    fun listBusinessRules(): List<BusinessRuleResponse> {
+        return businessRuleRepository.findAllByOrderByRuleKeyAscLocationIdAsc().map { it.toResponse() }
+    }
+
+    @Transactional
+    fun updateBusinessRule(ruleKey: String, request: UpdateBusinessRuleRequest, updatedBy: String): BusinessRuleResponse {
+        val existing = if (request.locationId != null) {
+            businessRuleRepository.findByRuleKeyAndLocationId(ruleKey, request.locationId)
+        } else {
+            businessRuleRepository.findByRuleKeyAndLocationIdIsNull(ruleKey)
+        }
+
+        val saved = if (existing != null) {
+            existing.value = request.value
+            existing.description = request.description ?: existing.description
+            existing.updatedBy = updatedBy
+            businessRuleRepository.save(existing)
+        } else {
+            val globalRule = businessRuleRepository.findByRuleKeyAndLocationIdIsNull(ruleKey)
+                ?: throw BusinessRuleNotFoundException(ruleKey)
+
+            if (request.locationId == null) {
+                throw BusinessRuleNotFoundException(ruleKey)
+            }
+
+            businessRuleRepository.save(
+                BusinessRule(
+                    ruleKey = ruleKey,
+                    value = request.value,
+                    locationId = request.locationId,
+                    description = request.description ?: globalRule.description,
+                    updatedBy = updatedBy,
+                ),
+            )
+        }
+
+        eventPublisher.publishEvent(
+            BusinessRuleUpdatedEvent(
+                ruleKey = ruleKey,
+                newValue = request.value,
+                locationId = request.locationId,
+                updatedBy = updatedBy,
+            ),
+        )
+
+        return saved.toResponse()
     }
 
     // --- Private validation helpers ---

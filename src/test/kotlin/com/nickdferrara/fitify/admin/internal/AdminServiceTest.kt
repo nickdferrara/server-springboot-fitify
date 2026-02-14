@@ -1,14 +1,19 @@
 package com.nickdferrara.fitify.admin.internal
 
+import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateClassRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateRecurringScheduleRequest
+import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateBusinessRuleRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateClassRequest
+import com.nickdferrara.fitify.admin.internal.entities.BusinessRule
 import com.nickdferrara.fitify.admin.internal.entities.RecurringSchedule
+import com.nickdferrara.fitify.admin.internal.exceptions.BusinessRuleNotFoundException
 import com.nickdferrara.fitify.admin.internal.exceptions.ClassNotFoundException
 import com.nickdferrara.fitify.admin.internal.exceptions.CoachNotFoundException
 import com.nickdferrara.fitify.admin.internal.exceptions.CoachScheduleConflictException
 import com.nickdferrara.fitify.admin.internal.exceptions.InvalidRecurringScheduleException
 import com.nickdferrara.fitify.admin.internal.exceptions.LocationNotFoundException
+import com.nickdferrara.fitify.admin.internal.repository.BusinessRuleRepository
 import com.nickdferrara.fitify.admin.internal.repository.RecurringScheduleRepository
 import com.nickdferrara.fitify.coaching.CoachSummary
 import com.nickdferrara.fitify.coaching.CoachingApi
@@ -27,8 +32,10 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.context.ApplicationEventPublisher
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -41,7 +48,12 @@ class AdminServiceTest {
     private val coachingApi = mockk<CoachingApi>()
     private val locationApi = mockk<LocationApi>()
     private val recurringScheduleRepository = mockk<RecurringScheduleRepository>()
-    private val service = AdminService(schedulingApi, coachingApi, locationApi, recurringScheduleRepository)
+    private val businessRuleRepository = mockk<BusinessRuleRepository>()
+    private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
+    private val service = AdminService(
+        schedulingApi, coachingApi, locationApi, recurringScheduleRepository,
+        businessRuleRepository, eventPublisher,
+    )
 
     private val locationId: UUID = UUID.randomUUID()
     private val coachId: UUID = UUID.randomUUID()
@@ -455,5 +467,131 @@ class AdminServiceTest {
 
         assertEquals(1, response.classesCreated) // Only Wednesday created
         verify(exactly = 1) { schedulingApi.createClass(locationId, any()) }
+    }
+
+    // --- getBusinessRuleValue Tests ---
+
+    @Test
+    fun `getBusinessRuleValue returns global value when no location specified`() {
+        val rule = BusinessRule(
+            id = UUID.randomUUID(), ruleKey = "max_waitlist_size", value = "20", updatedBy = "system",
+        )
+        every { businessRuleRepository.findByRuleKeyAndLocationIdIsNull("max_waitlist_size") } returns rule
+
+        val result = service.getBusinessRuleValue("max_waitlist_size")
+
+        assertEquals("20", result)
+    }
+
+    @Test
+    fun `getBusinessRuleValue returns location override when available`() {
+        val override = BusinessRule(
+            id = UUID.randomUUID(), ruleKey = "max_waitlist_size", value = "10",
+            locationId = locationId, updatedBy = "admin",
+        )
+        every { businessRuleRepository.findByRuleKeyAndLocationId("max_waitlist_size", locationId) } returns override
+
+        val result = service.getBusinessRuleValue("max_waitlist_size", locationId)
+
+        assertEquals("10", result)
+    }
+
+    @Test
+    fun `getBusinessRuleValue falls back to global when no location override`() {
+        val global = BusinessRule(
+            id = UUID.randomUUID(), ruleKey = "max_waitlist_size", value = "20", updatedBy = "system",
+        )
+        every { businessRuleRepository.findByRuleKeyAndLocationId("max_waitlist_size", locationId) } returns null
+        every { businessRuleRepository.findByRuleKeyAndLocationIdIsNull("max_waitlist_size") } returns global
+
+        val result = service.getBusinessRuleValue("max_waitlist_size", locationId)
+
+        assertEquals("20", result)
+    }
+
+    @Test
+    fun `getBusinessRuleValue returns null when rule does not exist`() {
+        every { businessRuleRepository.findByRuleKeyAndLocationIdIsNull("nonexistent") } returns null
+
+        val result = service.getBusinessRuleValue("nonexistent")
+
+        assertNull(result)
+    }
+
+    // --- listBusinessRules Tests ---
+
+    @Test
+    fun `listBusinessRules returns all rules sorted`() {
+        val rules = listOf(
+            BusinessRule(
+                id = UUID.randomUUID(), ruleKey = "cancellation_window_hours", value = "24", updatedBy = "system",
+            ),
+            BusinessRule(
+                id = UUID.randomUUID(), ruleKey = "max_waitlist_size", value = "20", updatedBy = "system",
+            ),
+        )
+        every { businessRuleRepository.findAllByOrderByRuleKeyAscLocationIdAsc() } returns rules
+
+        val result = service.listBusinessRules()
+
+        assertEquals(2, result.size)
+        assertEquals("cancellation_window_hours", result[0].ruleKey)
+        assertEquals("max_waitlist_size", result[1].ruleKey)
+    }
+
+    // --- updateBusinessRule Tests ---
+
+    @Test
+    fun `updateBusinessRule updates existing global rule`() {
+        val existing = BusinessRule(
+            id = UUID.randomUUID(), ruleKey = "max_waitlist_size", value = "20", updatedBy = "system",
+        )
+        val request = UpdateBusinessRuleRequest(value = "30")
+
+        every { businessRuleRepository.findByRuleKeyAndLocationIdIsNull("max_waitlist_size") } returns existing
+        every { businessRuleRepository.save(any()) } answers { firstArg() }
+
+        val result = service.updateBusinessRule("max_waitlist_size", request, "admin@test.com")
+
+        assertEquals("30", result.value)
+        assertEquals("admin@test.com", result.updatedBy)
+        verify { eventPublisher.publishEvent(any<BusinessRuleUpdatedEvent>()) }
+    }
+
+    @Test
+    fun `updateBusinessRule creates location override when global exists`() {
+        val global = BusinessRule(
+            id = UUID.randomUUID(), ruleKey = "max_waitlist_size", value = "20",
+            description = "Max waitlist", updatedBy = "system",
+        )
+        val request = UpdateBusinessRuleRequest(value = "10", locationId = locationId)
+
+        every { businessRuleRepository.findByRuleKeyAndLocationId("max_waitlist_size", locationId) } returns null
+        every { businessRuleRepository.findByRuleKeyAndLocationIdIsNull("max_waitlist_size") } returns global
+        every { businessRuleRepository.save(any()) } answers {
+            val rule = firstArg<BusinessRule>()
+            BusinessRule(
+                id = UUID.randomUUID(), ruleKey = rule.ruleKey, value = rule.value,
+                locationId = rule.locationId, description = rule.description, updatedBy = rule.updatedBy,
+            )
+        }
+
+        val result = service.updateBusinessRule("max_waitlist_size", request, "admin@test.com")
+
+        assertEquals("10", result.value)
+        assertEquals(locationId, result.locationId)
+        verify { eventPublisher.publishEvent(any<BusinessRuleUpdatedEvent>()) }
+    }
+
+    @Test
+    fun `updateBusinessRule throws when global rule not found`() {
+        val request = UpdateBusinessRuleRequest(value = "10", locationId = locationId)
+
+        every { businessRuleRepository.findByRuleKeyAndLocationId("nonexistent", locationId) } returns null
+        every { businessRuleRepository.findByRuleKeyAndLocationIdIsNull("nonexistent") } returns null
+
+        assertThrows<BusinessRuleNotFoundException> {
+            service.updateBusinessRule("nonexistent", request, "admin@test.com")
+        }
     }
 }
