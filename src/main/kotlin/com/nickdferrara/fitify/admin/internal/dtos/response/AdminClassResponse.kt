@@ -1,13 +1,11 @@
-package com.nickdferrara.fitify.scheduling.internal.dtos.response
+package com.nickdferrara.fitify.admin.internal.dtos.response
 
-import com.nickdferrara.fitify.scheduling.internal.entities.BookingStatus
-import com.nickdferrara.fitify.scheduling.internal.entities.FitnessClass
+import com.nickdferrara.fitify.scheduling.ClassDetail
 import java.time.Instant
 import java.util.UUID
 
-internal data class ClassResponse(
+internal data class AdminClassResponse(
     val id: UUID,
-    val locationId: UUID,
     val name: String,
     val description: String?,
     val classType: String,
@@ -16,15 +14,15 @@ internal data class ClassResponse(
     val startTime: Instant,
     val endTime: Instant,
     val capacity: Int,
+    val locationId: UUID,
     val status: String,
     val enrolledCount: Int,
     val waitlistSize: Int,
     val createdAt: Instant,
 )
 
-internal fun FitnessClass.toResponse() = ClassResponse(
-    id = id!!,
-    locationId = locationId,
+internal fun ClassDetail.toAdminResponse() = AdminClassResponse(
+    id = id,
     name = name,
     description = description,
     classType = classType,
@@ -33,8 +31,9 @@ internal fun FitnessClass.toResponse() = ClassResponse(
     startTime = startTime,
     endTime = endTime,
     capacity = capacity,
-    status = status.name,
-    enrolledCount = bookings.count { it.status == BookingStatus.CONFIRMED },
-    waitlistSize = waitlistEntries.size,
-    createdAt = createdAt!!,
+    locationId = locationId,
+    status = status,
+    enrolledCount = enrolledCount,
+    waitlistSize = waitlistSize,
+    createdAt = createdAt,
 )

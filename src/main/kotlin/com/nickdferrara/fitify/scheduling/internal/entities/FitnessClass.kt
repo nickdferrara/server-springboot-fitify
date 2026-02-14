@@ -41,6 +41,8 @@ internal class FitnessClass(
     @Column(name = "end_time")
     var endTime: Instant,
 
+    var description: String? = null,
+
     var capacity: Int,
 
     @Enumerated(EnumType.STRING)

@@ -1,4 +1,4 @@
-package com.nickdferrara.fitify.scheduling.internal.dtos.request
+package com.nickdferrara.fitify.admin.internal.dtos.request
 
 import java.time.Instant
 import java.util.UUID
