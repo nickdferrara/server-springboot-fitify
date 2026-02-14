@@ -43,6 +43,9 @@ dependencies {
     // Keycloak
     implementation("org.keycloak:keycloak-admin-client:26.0.0")
 
+    // Stripe
+    implementation("com.stripe:stripe-java:28.2.0")
+
     // Database
     runtimeOnly("org.postgresql:postgresql")
 
