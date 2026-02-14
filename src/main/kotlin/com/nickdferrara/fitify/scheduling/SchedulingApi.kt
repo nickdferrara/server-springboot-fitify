@@ -62,6 +62,14 @@ data class CancelClassResult(
     val waitlistUserIds: List<UUID>,
 )
 
+data class ClassUtilizationSummary(
+    val classId: UUID,
+    val locationId: UUID,
+    val classType: String,
+    val capacity: Int,
+    val enrolledCount: Int,
+)
+
 interface SchedulingApi {
     fun findClassById(id: UUID): Result<ClassSummary, DomainError>
     fun findUpcomingClassesByLocationId(locationId: UUID): List<ClassSummary>
@@ -71,4 +79,6 @@ interface SchedulingApi {
     fun getClassDetail(classId: UUID): Result<ClassDetail, DomainError>
     fun findClassesByLocationId(locationId: UUID): List<ClassDetail>
     fun findClassesByCoachIdAndTimeRange(coachId: UUID, startTime: Instant, endTime: Instant): List<ClassSummary>
+    fun getClassUtilizationByDateRange(start: Instant, end: Instant): List<ClassUtilizationSummary>
+    fun countBookingCancellationsBetween(start: Instant, end: Instant, locationId: UUID?): Long
 }
