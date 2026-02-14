@@ -46,6 +46,10 @@ dependencies {
     // Stripe
     implementation("com.stripe:stripe-java:28.2.0")
 
+    // Notification
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("com.google.firebase:firebase-admin:9.4.3")
+
     // Database
     runtimeOnly("org.postgresql:postgresql")
 

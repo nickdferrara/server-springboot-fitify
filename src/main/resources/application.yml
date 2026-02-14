@@ -19,6 +19,12 @@ spring:
       hibernate:
         format_sql: true
 
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+
   security:
     oauth2:
       resourceserver:
@@ -37,6 +43,11 @@ management:
         enabled: true
 
 fitify:
+  notification:
+    from-email: ${NOTIFICATION_FROM_EMAIL:noreply@fitify.com}
+    from-name: ${NOTIFICATION_FROM_NAME:Fitify}
+  firebase:
+    service-account-path: ${FIREBASE_SERVICE_ACCOUNT_PATH:}
   keycloak:
     server-url: http://localhost:8180
     realm: fitify
