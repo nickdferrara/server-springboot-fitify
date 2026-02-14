@@ -43,6 +43,9 @@ dependencies {
     // Keycloak
     implementation("org.keycloak:keycloak-admin-client:26.0.0")
 
+    // Rate Limiting
+    implementation("com.bucket4j:bucket4j-core:8.10.1")
+
     // Stripe
     implementation("com.stripe:stripe-java:28.2.0")
 

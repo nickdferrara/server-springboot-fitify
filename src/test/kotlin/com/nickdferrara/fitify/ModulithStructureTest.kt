@@ -24,7 +24,7 @@ class ModulithStructureTest {
         @Suppress("DEPRECATION")
         val moduleNames = modules.map { it.name }.sorted()
         assertEquals(
-            listOf("admin", "coaching", "identity", "location", "notification", "scheduling", "shared", "subscription"),
+            listOf("admin", "coaching", "identity", "location", "notification", "scheduling", "security", "shared", "subscription"),
             moduleNames,
         )
     }

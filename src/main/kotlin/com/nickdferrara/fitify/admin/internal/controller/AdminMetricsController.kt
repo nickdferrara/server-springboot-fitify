@@ -66,7 +66,7 @@ internal class AdminMetricsController(
 
 @RestController
 @RequestMapping("/api/v1/admin/locations/{locationId}/metrics")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("@locationAdminService.hasAccess(authentication, #locationId)")
 internal class AdminLocationMetricsController(
     private val metricsService: MetricsService,
 ) {

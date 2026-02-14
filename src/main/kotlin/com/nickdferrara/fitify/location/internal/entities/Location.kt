@@ -1,7 +1,10 @@
 package com.nickdferrara.fitify.location.internal.entities
 
+import com.nickdferrara.fitify.shared.crypto.DeterministicEncryptedStringConverter
+import com.nickdferrara.fitify.shared.crypto.NonDeterministicEncryptedStringConverter
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
+import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -31,8 +34,10 @@ internal class Location(
     @Column(name = "zip_code")
     var zipCode: String,
 
+    @Convert(converter = NonDeterministicEncryptedStringConverter::class)
     var phone: String,
 
+    @Convert(converter = DeterministicEncryptedStringConverter::class)
     var email: String,
 
     @Column(name = "time_zone")
