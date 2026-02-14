@@ -25,6 +25,7 @@ internal class SecurityConfig {
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers("/api/v1/auth/**").permitAll()
+                it.requestMatchers("/api/v1/webhooks/**").permitAll()
                 it.requestMatchers("/actuator/health/**").permitAll()
                 it.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 it.anyRequest().authenticated()

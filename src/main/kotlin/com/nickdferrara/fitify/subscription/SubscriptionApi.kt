@@ -1,3 +1,17 @@
 package com.nickdferrara.fitify.subscription
 
-interface SubscriptionApi
+import java.time.Instant
+import java.util.UUID
+
+data class SubscriptionSummary(
+    val id: UUID,
+    val userId: UUID,
+    val planType: String,
+    val status: String,
+    val currentPeriodEnd: Instant?,
+)
+
+interface SubscriptionApi {
+    fun findActiveSubscriptionByUserId(userId: UUID): SubscriptionSummary?
+    fun hasActiveSubscription(userId: UUID): Boolean
+}

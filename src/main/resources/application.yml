@@ -42,6 +42,11 @@ fitify:
     realm: fitify
     client-id: fitify-api
     client-secret: change-me
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY:sk_test_placeholder}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_placeholder}
+    success-url: ${STRIPE_SUCCESS_URL:http://localhost:3000/subscription/success}
+    cancel-url: ${STRIPE_CANCEL_URL:http://localhost:3000/subscription/cancel}
 
 server:
   port: 8080

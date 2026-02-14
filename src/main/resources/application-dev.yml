@@ -15,6 +15,11 @@ fitify:
     realm: fitify
     client-id: fitify-api
     client-secret: dev-secret
+  stripe:
+    secret-key: sk_test_dev_placeholder
+    webhook-secret: whsec_dev_placeholder
+    success-url: http://localhost:3000/subscription/success
+    cancel-url: http://localhost:3000/subscription/cancel
 
 logging:
   level:
