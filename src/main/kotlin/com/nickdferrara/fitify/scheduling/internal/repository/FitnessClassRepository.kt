@@ -26,4 +26,12 @@ internal interface FitnessClassRepository :
         """
     )
     fun findByCoachIdAndTimeRange(coachId: UUID, startTime: Instant, endTime: Instant): List<FitnessClass>
+
+    @Query(
+        """
+        SELECT DISTINCT fc FROM FitnessClass fc LEFT JOIN FETCH fc.bookings
+        WHERE fc.status = 'ACTIVE' AND fc.startTime >= :start AND fc.startTime < :end
+        """
+    )
+    fun findWithBookingsByDateRange(start: Instant, end: Instant): List<FitnessClass>
 }

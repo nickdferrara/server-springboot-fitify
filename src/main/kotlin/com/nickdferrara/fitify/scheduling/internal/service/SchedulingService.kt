@@ -8,6 +8,7 @@ import com.nickdferrara.fitify.scheduling.ClassDetail
 import com.nickdferrara.fitify.scheduling.ClassFullEvent
 import com.nickdferrara.fitify.scheduling.ClassSummary
 import com.nickdferrara.fitify.scheduling.ClassUpdatedEvent
+import com.nickdferrara.fitify.scheduling.ClassUtilizationSummary
 import com.nickdferrara.fitify.scheduling.CreateClassCommand
 import com.nickdferrara.fitify.scheduling.SchedulingApi
 import com.nickdferrara.fitify.scheduling.UpdateClassCommand
@@ -182,6 +183,26 @@ internal class SchedulingService(
         return fitnessClassRepository
             .findByCoachIdAndTimeRange(coachId, startTime, endTime)
             .map { it.toSummary() }
+    }
+
+    override fun getClassUtilizationByDateRange(start: Instant, end: Instant): List<ClassUtilizationSummary> {
+        return fitnessClassRepository.findWithBookingsByDateRange(start, end).map { fc ->
+            ClassUtilizationSummary(
+                classId = fc.id!!,
+                locationId = fc.locationId,
+                classType = fc.classType,
+                capacity = fc.capacity,
+                enrolledCount = fc.bookings.count { it.status == BookingStatus.CONFIRMED },
+            )
+        }
+    }
+
+    override fun countBookingCancellationsBetween(start: Instant, end: Instant, locationId: UUID?): Long {
+        return if (locationId != null) {
+            bookingRepository.countCancellationsBetweenAndLocationId(start, end, locationId)
+        } else {
+            bookingRepository.countCancellationsBetween(start, end)
+        }
     }
 
     // --- Search ---

@@ -76,6 +76,30 @@ internal class SubscriptionService(
         )
     }
 
+    override fun countActiveSubscriptionsByPlanType(): Map<String, Long> {
+        return subscriptionRepository
+            .countByStatusInGroupByPlanType(listOf(SubscriptionStatus.ACTIVE, SubscriptionStatus.CANCELLING))
+            .associate { (it[0] as PlanType).name to it[1] as Long }
+    }
+
+    override fun countSubscriptionsExpiredBetween(start: Instant, end: Instant): Long {
+        return subscriptionRepository.countExpiredBetween(start, end)
+    }
+
+    override fun countActiveSubscriptionsAsOf(asOf: Instant): Long {
+        return subscriptionRepository.countActiveAsOf(asOf)
+    }
+
+    override fun sumRevenueBetween(start: Instant, end: Instant): BigDecimal {
+        return paymentHistoryRepository.sumRevenueBetween(start, end)
+    }
+
+    override fun sumRevenueBetweenByPlanType(start: Instant, end: Instant): Map<String, BigDecimal> {
+        return paymentHistoryRepository
+            .sumRevenueBetweenGroupByPlanType(start, end)
+            .associate { (it[0] as PlanType).name to it[1] as BigDecimal }
+    }
+
     // --- User-facing methods ---
 
     fun getAvailablePlans(): List<SubscriptionPlanResponse> {

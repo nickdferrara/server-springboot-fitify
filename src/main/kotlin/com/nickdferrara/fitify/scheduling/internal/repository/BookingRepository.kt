@@ -40,4 +40,21 @@ internal interface BookingRepository : JpaRepository<Booking, UUID> {
     fun countUserBookingsForDay(userId: UUID, dayStart: Instant, dayEnd: Instant): Long
 
     fun findByFitnessClassIdAndStatus(fitnessClassId: UUID, status: BookingStatus): List<Booking>
+
+    @Query(
+        """
+        SELECT COUNT(b) FROM Booking b
+        WHERE b.status = 'CANCELLED' AND b.cancelledAt BETWEEN :start AND :end
+        """
+    )
+    fun countCancellationsBetween(start: Instant, end: Instant): Long
+
+    @Query(
+        """
+        SELECT COUNT(b) FROM Booking b
+        WHERE b.status = 'CANCELLED' AND b.cancelledAt BETWEEN :start AND :end
+          AND b.fitnessClass.locationId = :locationId
+        """
+    )
+    fun countCancellationsBetweenAndLocationId(start: Instant, end: Instant, locationId: UUID): Long
 }
