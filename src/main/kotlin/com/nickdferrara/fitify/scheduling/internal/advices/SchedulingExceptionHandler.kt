@@ -1,6 +1,5 @@
 package com.nickdferrara.fitify.scheduling.internal.advices
 
-import com.nickdferrara.fitify.scheduling.internal.controller.AdminClassController
 import com.nickdferrara.fitify.scheduling.internal.controller.ClassController
 import com.nickdferrara.fitify.scheduling.internal.controller.WaitlistController
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.ErrorResponse
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice(
     assignableTypes = [
-        AdminClassController::class,
         ClassController::class,
         WaitlistController::class,
     ]
