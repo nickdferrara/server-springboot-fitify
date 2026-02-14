@@ -10,6 +10,11 @@ spring:
       maximum-pool-size: 10
 
 fitify:
+  notification:
+    from-email: noreply@fitify.local
+    from-name: Fitify Dev
+  firebase:
+    service-account-path: ""
   keycloak:
     server-url: http://localhost:8180
     realm: fitify
