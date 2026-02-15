@@ -6,4 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 internal data class NotificationProperties(
     val fromEmail: String,
     val fromName: String,
-)
+    val email: EmailProperties = EmailProperties(),
+) {
+    internal data class EmailProperties(
+        val provider: String = "smtp",
+    )
+}
