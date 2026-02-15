@@ -6,8 +6,8 @@ import com.nickdferrara.fitify.identity.internal.dtos.response.ErrorResponse
 import com.nickdferrara.fitify.identity.internal.exception.EmailAlreadyExistsException
 import com.nickdferrara.fitify.identity.internal.exception.InvalidTokenException
 import com.nickdferrara.fitify.identity.internal.exception.UserNotFoundException
+import com.nickdferrara.fitify.identity.internal.exception.IdentityProviderException
 import com.nickdferrara.fitify.identity.internal.exception.WeakPasswordException
-import com.nickdferrara.fitify.identity.internal.service.KeycloakException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -46,8 +46,8 @@ internal class IdentityExceptionHandler {
             .body(ErrorResponse(ex.message ?: "Invalid argument"))
     }
 
-    @ExceptionHandler(KeycloakException::class)
-    fun handleKeycloak(ex: KeycloakException): ResponseEntity<ErrorResponse> {
+    @ExceptionHandler(IdentityProviderException::class)
+    fun handleIdentityProvider(ex: IdentityProviderException): ResponseEntity<ErrorResponse> {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
             .body(ErrorResponse(ex.message ?: "Identity provider unavailable"))
     }

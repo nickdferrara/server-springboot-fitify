@@ -1,6 +1,8 @@
-package com.nickdferrara.fitify.identity.internal.service
+package com.nickdferrara.fitify.identity.internal.gateway
 
 import com.nickdferrara.fitify.identity.internal.config.KeycloakProperties
+import com.nickdferrara.fitify.identity.internal.exception.IdentityProviderConflictException
+import com.nickdferrara.fitify.identity.internal.exception.IdentityProviderException
 import jakarta.ws.rs.ClientErrorException
 import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.representations.idm.CredentialRepresentation
@@ -10,9 +12,9 @@ import org.springframework.stereotype.Component
 
 @Component
 @EnableConfigurationProperties(KeycloakProperties::class)
-internal class KeycloakClient(
+internal class KeycloakIdentityProviderGateway(
     private val properties: KeycloakProperties,
-) {
+) : IdentityProviderGateway {
 
     private val keycloak by lazy {
         KeycloakBuilder.builder()
@@ -26,7 +28,7 @@ internal class KeycloakClient(
 
     private fun realmResource() = keycloak.realm(properties.realm)
 
-    fun createUser(email: String, password: String, firstName: String, lastName: String): String {
+    override fun createUser(email: String, password: String, firstName: String, lastName: String): String {
         val user = UserRepresentation().apply {
             this.username = email
             this.email = email
@@ -50,12 +52,12 @@ internal class KeycloakClient(
                 val locationHeader = response.location.toString()
                 locationHeader.substringAfterLast("/")
             }
-            409 -> throw KeycloakConflictException("User already exists in Keycloak: $email")
-            else -> throw KeycloakException("Failed to create user in Keycloak: ${response.status}")
+            409 -> throw IdentityProviderConflictException("User already exists: $email")
+            else -> throw IdentityProviderException("Failed to create user: ${response.status}")
         }
     }
 
-    fun updatePassword(keycloakId: String, newPassword: String) {
+    override fun updatePassword(keycloakId: String, newPassword: String) {
         try {
             val credential = CredentialRepresentation().apply {
                 type = CredentialRepresentation.PASSWORD
@@ -64,19 +66,15 @@ internal class KeycloakClient(
             }
             realmResource().users().get(keycloakId).resetPassword(credential)
         } catch (e: ClientErrorException) {
-            throw KeycloakException("Failed to update password in Keycloak: ${e.message}")
+            throw IdentityProviderException("Failed to update password: ${e.message}")
         }
     }
 
-    fun invalidateSessions(keycloakId: String) {
+    override fun invalidateSessions(keycloakId: String) {
         try {
             realmResource().users().get(keycloakId).logout()
         } catch (e: ClientErrorException) {
-            throw KeycloakException("Failed to invalidate sessions in Keycloak: ${e.message}")
+            throw IdentityProviderException("Failed to invalidate sessions: ${e.message}")
         }
     }
 }
-
-internal class KeycloakException(message: String) : RuntimeException(message)
-
-internal class KeycloakConflictException(message: String) : RuntimeException(message)

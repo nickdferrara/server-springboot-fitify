@@ -1,5 +1,6 @@
-package com.nickdferrara.fitify.identity.internal.service
+package com.nickdferrara.fitify.identity.internal.gateway
 
+import com.nickdferrara.fitify.identity.internal.exception.IdentityProviderConflictException
 import dasniko.testcontainers.keycloak.KeycloakContainer
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -16,7 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 @ActiveProfiles("integration")
 @EnabledIf("isDockerAvailable")
-internal class KeycloakClientIntegrationTest {
+internal class KeycloakIdentityProviderGatewayIntegrationTest {
 
     companion object {
         private val keycloak: KeycloakContainer by lazy {
@@ -47,11 +48,11 @@ internal class KeycloakClientIntegrationTest {
     }
 
     @Autowired
-    lateinit var keycloakClient: KeycloakClient
+    lateinit var gateway: KeycloakIdentityProviderGateway
 
     @Test
     fun `createUser creates a new user and returns keycloak ID`() {
-        val keycloakId = keycloakClient.createUser(
+        val keycloakId = gateway.createUser(
             email = "newuser-${System.currentTimeMillis()}@fitify.com",
             password = "test-password-123",
             firstName = "New",
@@ -64,19 +65,19 @@ internal class KeycloakClientIntegrationTest {
     @Test
     fun `createUser throws conflict when user already exists`() {
         val email = "duplicate-${System.currentTimeMillis()}@fitify.com"
-        keycloakClient.createUser(email, "password1", "First", "Last")
+        gateway.createUser(email, "password1", "First", "Last")
 
         assertThatThrownBy {
-            keycloakClient.createUser(email, "password2", "First", "Last")
-        }.isInstanceOf(KeycloakConflictException::class.java)
+            gateway.createUser(email, "password2", "First", "Last")
+        }.isInstanceOf(IdentityProviderConflictException::class.java)
     }
 
     @Test
     fun `updatePassword succeeds for existing user`() {
         val email = "pwdtest-${System.currentTimeMillis()}@fitify.com"
-        val keycloakId = keycloakClient.createUser(email, "old-password", "Pwd", "Test")
+        val keycloakId = gateway.createUser(email, "old-password", "Pwd", "Test")
 
-        keycloakClient.updatePassword(keycloakId, "new-password-123")
+        gateway.updatePassword(keycloakId, "new-password-123")
 
         // No exception thrown means success
     }
