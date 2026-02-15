@@ -57,8 +57,55 @@ services:
     networks:
       - fitify-network
 
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: fitify-loki
+    profiles: [observability]
+    command: -config.file=/etc/loki/loki-config.yml
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./infra/loki/loki-config.yml:/etc/loki/loki-config.yml
+      - loki-data:/loki
+    networks:
+      - fitify-network
+
+  promtail:
+    image: grafana/promtail:3.3.2
+    container_name: fitify-promtail
+    profiles: [observability]
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ./infra/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+    networks:
+      - fitify-network
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: fitify-grafana
+    profiles: [observability]
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - loki
+    networks:
+      - fitify-network
+
 volumes:
   fitify-pgdata:
+  loki-data:
+  grafana-data:
 
 networks:
   fitify-network:

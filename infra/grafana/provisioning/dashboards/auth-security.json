@@ -1,0 +1,155 @@
+{
+  "uid": "fitify-auth-security",
+  "title": "Auth & Security",
+  "tags": ["fitify", "security", "auth"],
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "options": [],
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Authentication Errors Over Time",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineWidth": 2
+          },
+          "color": {"fixedColor": "red", "mode": "fixed"},
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=~\"security|identity\"} |~ \"(?i)(auth|login|token|jwt|unauthorized|forbidden|401|403)\" | level =~ \"ERROR|WARN\" [$__interval]))",
+          "legendFormat": "Auth Errors"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Login Failure Rate",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 40,
+            "lineWidth": 1
+          },
+          "color": {"fixedColor": "orange", "mode": "fixed"},
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=~\"security|identity\"} |~ \"(?i)(login.*fail|authentication.*fail|invalid.*credentials|bad.*credentials|access.*denied)\" [$__interval]))",
+          "legendFormat": "Login Failures"
+        },
+        {
+          "refId": "B",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=~\"security|identity\"} |~ \"(?i)(login.*success|authenticated|token.*issued)\" [$__interval]))",
+          "legendFormat": "Login Successes"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Top IPs with Failed Auth",
+      "type": "table",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"displayName": "Value", "desc": true}]
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "topk(10, sum by (userId) (count_over_time({module=~\"security|identity\", level=~\"ERROR|WARN\"} |~ \"(?i)(auth|login|unauthorized|forbidden|denied)\" | userId != \"\" [$__range])))",
+          "legendFormat": "{{userId}}",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Security Event Logs",
+      "type": "logs",
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 8},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "{module=~\"security|identity\", level=~\"ERROR|WARN\"} |~ \"(?i)(auth|login|token|jwt|unauthorized|forbidden|denied)\" | json",
+          "maxLines": 200
+        }
+      ]
+    }
+  ]
+}
