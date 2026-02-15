@@ -103,12 +103,14 @@ internal class AuthService(
             )
         )
 
+        val expiresAt = Instant.now().plus(TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES)
+
         eventPublisher.publishEvent(
             PasswordResetRequestedEvent(
                 userId = user.id!!,
                 email = user.email,
-                resetToken = rawToken,
-                expiresInMinutes = TOKEN_EXPIRY_MINUTES,
+                resetLink = "/reset-password?token=$rawToken",
+                expiresAt = expiresAt,
             )
         )
 

@@ -21,6 +21,7 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.context.ApplicationEventPublisher
@@ -154,8 +155,9 @@ class AuthServiceTest {
         verify { eventPublisher.publishEvent(capture(eventSlot)) }
         assertEquals(user.id, eventSlot.captured.userId)
         assertEquals(user.email, eventSlot.captured.email)
-        assertNotNull(eventSlot.captured.resetToken)
-        assertEquals(30L, eventSlot.captured.expiresInMinutes)
+        assertNotNull(eventSlot.captured.resetLink)
+        assertTrue(eventSlot.captured.resetLink.startsWith("/reset-password?token="))
+        assertNotNull(eventSlot.captured.expiresAt)
     }
 
     @Test

@@ -51,7 +51,7 @@ class NotificationEventListenerTest {
 
     @Test
     fun `onPasswordResetRequested delegates to service`() {
-        val event = PasswordResetRequestedEvent(userId, "test@example.com", "reset-token", 30)
+        val event = PasswordResetRequestedEvent(userId, "test@example.com", "/reset-password?token=abc", Instant.now().plusSeconds(1800))
         val payload = buildPayload("Reset your password")
         every { payloadFactory.fromPasswordResetRequested(event) } returns payload
 
@@ -109,7 +109,7 @@ class NotificationEventListenerTest {
     @Test
     fun `onSubscriptionCreated delegates to service`() {
         val subscriptionId = UUID.randomUUID()
-        val event = SubscriptionCreatedEvent(subscriptionId, userId, "premium", "sub_123")
+        val event = SubscriptionCreatedEvent(subscriptionId, userId, "premium", "sub_123", Instant.now().plusSeconds(86400))
         val payload = buildPayload("Subscription confirmed", setOf(NotificationChannel.PUSH, NotificationChannel.EMAIL))
         every { payloadFactory.fromSubscriptionCreated(event) } returns payload
 
@@ -121,7 +121,7 @@ class NotificationEventListenerTest {
     @Test
     fun `onSubscriptionRenewed delegates to service`() {
         val subscriptionId = UUID.randomUUID()
-        val event = SubscriptionRenewedEvent(subscriptionId, userId, Instant.now())
+        val event = SubscriptionRenewedEvent(subscriptionId, userId, Instant.now(), "MONTHLY")
         val payload = buildPayload("Subscription renewed", setOf(NotificationChannel.PUSH, NotificationChannel.EMAIL))
         every { payloadFactory.fromSubscriptionRenewed(event) } returns payload
 

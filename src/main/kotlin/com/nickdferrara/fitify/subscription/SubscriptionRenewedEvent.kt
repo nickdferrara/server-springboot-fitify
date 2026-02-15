@@ -7,4 +7,5 @@ data class SubscriptionRenewedEvent(
     val subscriptionId: UUID,
     val userId: UUID,
     val newPeriodEnd: Instant,
+    val planType: String,
 )

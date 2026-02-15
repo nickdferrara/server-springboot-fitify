@@ -4,6 +4,8 @@ import com.nickdferrara.fitify.admin.internal.entities.MetricType
 import com.nickdferrara.fitify.admin.internal.entities.MetricsSnapshot
 import com.nickdferrara.fitify.admin.internal.repository.MetricsSnapshotRepository
 import com.nickdferrara.fitify.identity.UserRegisteredEvent
+import com.nickdferrara.fitify.location.LocationCreatedEvent
+import com.nickdferrara.fitify.notification.NotificationSentEvent
 import com.nickdferrara.fitify.scheduling.BookingCancelledEvent
 import com.nickdferrara.fitify.scheduling.ClassSummary
 import com.nickdferrara.fitify.scheduling.SchedulingApi
@@ -128,7 +130,7 @@ class MetricsEventListenerTest {
 
     @Test
     fun `onSubscriptionCreated creates revenue snapshot with plan type dimension`() {
-        val event = SubscriptionCreatedEvent(UUID.randomUUID(), UUID.randomUUID(), "MONTHLY", "sub_123")
+        val event = SubscriptionCreatedEvent(UUID.randomUUID(), UUID.randomUUID(), "MONTHLY", "sub_123", Instant.now().plusSeconds(86400))
 
         every {
             repository.findByMetricTypeAndSnapshotDateAndLocationIdIsNull(MetricType.REVENUE, any())
@@ -163,6 +165,49 @@ class MetricsEventListenerTest {
                 it.metricType == MetricType.WAITLIST_CONVERSION &&
                     it.locationId == locationId &&
                     it.dimensions == mapOf("class_type" to "yoga")
+            })
+        }
+    }
+
+    @Test
+    fun `onLocationCreated creates location snapshot`() {
+        val newLocationId = UUID.randomUUID()
+        val event = LocationCreatedEvent(newLocationId, "Downtown Gym", "123 Main St", "America/New_York")
+
+        every {
+            repository.findByMetricTypeAndSnapshotDateAndLocationId(MetricType.LOCATIONS, any(), newLocationId)
+        } returns emptyList()
+        every { repository.save(any()) } answers { firstArg() }
+
+        listener.onLocationCreated(event)
+
+        verify {
+            repository.save(match<MetricsSnapshot> {
+                it.metricType == MetricType.LOCATIONS &&
+                    it.locationId == newLocationId &&
+                    it.dimensions == mapOf("time_zone" to "America/New_York") &&
+                    it.value == BigDecimal.ONE
+            })
+        }
+    }
+
+    @Test
+    fun `onNotificationSent creates notification snapshot`() {
+        val event = NotificationSentEvent(UUID.randomUUID(), "EMAIL", "DELIVERED")
+
+        every {
+            repository.findByMetricTypeAndSnapshotDateAndLocationIdIsNull(MetricType.NOTIFICATIONS_SENT, any())
+        } returns emptyList()
+        every { repository.save(any()) } answers { firstArg() }
+
+        listener.onNotificationSent(event)
+
+        verify {
+            repository.save(match<MetricsSnapshot> {
+                it.metricType == MetricType.NOTIFICATIONS_SENT &&
+                    it.locationId == null &&
+                    it.dimensions == mapOf("channel" to "EMAIL", "status" to "DELIVERED") &&
+                    it.value == BigDecimal.ONE
             })
         }
     }

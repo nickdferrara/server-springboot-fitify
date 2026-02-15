@@ -1,5 +1,6 @@
 package com.nickdferrara.fitify.subscription
 
+import java.time.Instant
 import java.util.UUID
 
 data class SubscriptionCreatedEvent(
@@ -7,4 +8,5 @@ data class SubscriptionCreatedEvent(
     val userId: UUID,
     val planType: String,
     val stripeSubscriptionId: String,
+    val expiresAt: Instant,
 )
