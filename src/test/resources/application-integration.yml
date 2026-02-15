@@ -1,0 +1,23 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+fitify:
+  encryption:
+    secret-key: "dGVzdC1lbmNyeXB0aW9uLWtleS0zMmI="
+
+stripe:
+  secret-key: "sk_test_dummy"
+  webhook-secret: "whsec_test_dummy"
+  success-url: "http://localhost:3000/success"
+  cancel-url: "http://localhost:3000/cancel"
+
+keycloak:
+  server-url: "http://localhost:8080"
+  realm: "fitify-test"
+  client-id: "fitify-api"
+  client-secret: "test-secret"
