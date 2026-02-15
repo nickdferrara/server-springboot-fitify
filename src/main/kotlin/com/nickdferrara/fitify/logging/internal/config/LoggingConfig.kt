@@ -4,7 +4,7 @@ import com.nickdferrara.fitify.logging.internal.aspect.AuditAspect
 import com.nickdferrara.fitify.logging.internal.aspect.ExceptionLoggingAspect
 import com.nickdferrara.fitify.logging.internal.aspect.LoggingAspect
 import com.nickdferrara.fitify.logging.internal.service.AuditLogService
-import com.nickdferrara.fitify.logging.internal.service.SensitiveDataMasker
+import com.nickdferrara.fitify.logging.internal.util.SensitiveDataMasker
 import org.slf4j.MDC
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.task.ThreadPoolTaskExecutorCustomizer

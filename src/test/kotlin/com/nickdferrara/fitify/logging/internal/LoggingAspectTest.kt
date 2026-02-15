@@ -4,7 +4,7 @@ import com.nickdferrara.fitify.logging.LogExecution
 import com.nickdferrara.fitify.logging.LogLevel
 import com.nickdferrara.fitify.logging.internal.aspect.LoggingAspect
 import com.nickdferrara.fitify.logging.internal.config.LoggingProperties
-import com.nickdferrara.fitify.logging.internal.service.SensitiveDataMasker
+import com.nickdferrara.fitify.logging.internal.util.SensitiveDataMasker
 import io.mockk.every
 import io.mockk.mockk
 import org.aspectj.lang.ProceedingJoinPoint

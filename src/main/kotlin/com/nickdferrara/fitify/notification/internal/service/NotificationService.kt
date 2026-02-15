@@ -1,5 +1,8 @@
 package com.nickdferrara.fitify.notification.internal.service
 
+import com.nickdferrara.fitify.notification.internal.adapter.interfaces.NotificationChannelSender
+import com.nickdferrara.fitify.notification.internal.factory.NotificationPayload
+import com.nickdferrara.fitify.notification.internal.factory.NotificationPayloadFactory
 import com.nickdferrara.fitify.notification.NotificationApi
 import com.nickdferrara.fitify.notification.NotificationFailedEvent
 import com.nickdferrara.fitify.notification.NotificationSentEvent

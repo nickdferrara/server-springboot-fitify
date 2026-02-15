@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.scheduling.internal.repository
 
 import com.nickdferrara.fitify.scheduling.internal.entities.FitnessClass
-import com.nickdferrara.fitify.scheduling.internal.entities.FitnessClassStatus
+import com.nickdferrara.fitify.scheduling.internal.enums.FitnessClassStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

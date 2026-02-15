@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.identity.internal
 
-import com.nickdferrara.fitify.identity.internal.service.IdentityEventListener
+import com.nickdferrara.fitify.identity.internal.listener.IdentityEventListener
 import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import org.junit.jupiter.api.Test
 

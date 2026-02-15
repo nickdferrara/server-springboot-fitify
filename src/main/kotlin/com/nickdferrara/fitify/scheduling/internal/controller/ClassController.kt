@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.scheduling.internal.controller
 
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.ClassResponse
-import com.nickdferrara.fitify.scheduling.internal.service.BookClassResult
+import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
 import com.nickdferrara.fitify.scheduling.internal.service.SchedulingService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

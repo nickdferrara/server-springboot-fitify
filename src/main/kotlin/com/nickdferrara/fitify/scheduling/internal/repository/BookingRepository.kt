@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.scheduling.internal.repository
 
 import com.nickdferrara.fitify.scheduling.internal.entities.Booking
-import com.nickdferrara.fitify.scheduling.internal.entities.BookingStatus
+import com.nickdferrara.fitify.scheduling.internal.enums.BookingStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import java.time.Instant

@@ -1,7 +1,8 @@
 package com.nickdferrara.fitify.scheduling.internal.repository
 
 import com.nickdferrara.fitify.scheduling.internal.entities.FitnessClass
-import com.nickdferrara.fitify.scheduling.internal.entities.FitnessClassStatus
+import com.nickdferrara.fitify.scheduling.internal.specifications.FitnessClassSpecifications
+import com.nickdferrara.fitify.scheduling.internal.enums.FitnessClassStatus
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

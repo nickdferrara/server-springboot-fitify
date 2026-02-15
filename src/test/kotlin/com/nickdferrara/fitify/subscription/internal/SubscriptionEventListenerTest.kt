@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.subscription.internal
 
 import com.nickdferrara.fitify.identity.UserRegisteredEvent
 import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
-import com.nickdferrara.fitify.subscription.internal.service.SubscriptionEventListener
+import com.nickdferrara.fitify.subscription.internal.listener.SubscriptionEventListener
 import org.junit.jupiter.api.Test
 import java.util.UUID
 

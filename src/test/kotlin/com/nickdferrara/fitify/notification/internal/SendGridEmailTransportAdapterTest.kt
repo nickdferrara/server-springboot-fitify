@@ -1,8 +1,8 @@
 package com.nickdferrara.fitify.notification.internal
 
 import com.nickdferrara.fitify.notification.internal.exception.NotificationDeliveryException
-import com.nickdferrara.fitify.notification.internal.service.EmailAddress
-import com.nickdferrara.fitify.notification.internal.service.SendGridEmailTransportAdapter
+import com.nickdferrara.fitify.notification.internal.adapter.SendGridEmailTransportAdapter
+import com.nickdferrara.fitify.notification.internal.adapter.interfaces.EmailAddress
 import com.sendgrid.Request
 import com.sendgrid.Response
 import com.sendgrid.SendGrid

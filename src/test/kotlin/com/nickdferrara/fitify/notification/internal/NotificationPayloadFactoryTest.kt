@@ -3,7 +3,7 @@ package com.nickdferrara.fitify.notification.internal
 import com.nickdferrara.fitify.identity.PasswordResetRequestedEvent
 import com.nickdferrara.fitify.identity.UserRegisteredEvent
 import com.nickdferrara.fitify.notification.internal.entities.NotificationChannel
-import com.nickdferrara.fitify.notification.internal.service.NotificationPayloadFactory
+import com.nickdferrara.fitify.notification.internal.factory.NotificationPayloadFactory
 import com.nickdferrara.fitify.scheduling.BookingCancelledEvent
 import com.nickdferrara.fitify.scheduling.ClassBookedEvent
 import com.nickdferrara.fitify.scheduling.WaitlistPromotedEvent

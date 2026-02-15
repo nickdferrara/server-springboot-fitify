@@ -2,9 +2,9 @@ package com.nickdferrara.fitify.notification.internal
 
 import com.nickdferrara.fitify.notification.internal.config.NotificationProperties
 import com.nickdferrara.fitify.notification.internal.entities.NotificationChannel
-import com.nickdferrara.fitify.notification.internal.service.EmailAddress
-import com.nickdferrara.fitify.notification.internal.service.EmailChannelSender
-import com.nickdferrara.fitify.notification.internal.service.EmailTransport
+import com.nickdferrara.fitify.notification.internal.adapter.EmailChannelSender
+import com.nickdferrara.fitify.notification.internal.adapter.interfaces.EmailAddress
+import com.nickdferrara.fitify.notification.internal.adapter.interfaces.EmailTransport
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
