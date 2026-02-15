@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.logging.internal
 
 import com.nickdferrara.fitify.logging.Sensitive
-import com.nickdferrara.fitify.logging.internal.service.SensitiveDataMasker
+import com.nickdferrara.fitify.logging.internal.util.SensitiveDataMasker
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

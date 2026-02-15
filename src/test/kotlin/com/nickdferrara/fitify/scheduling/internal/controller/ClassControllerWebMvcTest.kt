@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.scheduling.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.ClassResponse
-import com.nickdferrara.fitify.scheduling.internal.service.BookClassResult
+import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
 import com.nickdferrara.fitify.scheduling.internal.service.SchedulingService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every

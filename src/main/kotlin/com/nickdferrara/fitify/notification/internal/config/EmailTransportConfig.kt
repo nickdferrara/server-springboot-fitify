@@ -1,8 +1,8 @@
 package com.nickdferrara.fitify.notification.internal.config
 
-import com.nickdferrara.fitify.notification.internal.service.EmailTransport
-import com.nickdferrara.fitify.notification.internal.service.SendGridEmailTransportAdapter
-import com.nickdferrara.fitify.notification.internal.service.SmtpEmailTransportAdapter
+import com.nickdferrara.fitify.notification.internal.adapter.SendGridEmailTransportAdapter
+import com.nickdferrara.fitify.notification.internal.adapter.SmtpEmailTransportAdapter
+import com.nickdferrara.fitify.notification.internal.adapter.interfaces.EmailTransport
 import com.sendgrid.SendGrid
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty

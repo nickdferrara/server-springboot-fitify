@@ -1,8 +1,8 @@
 package com.nickdferrara.fitify.notification.internal
 
 import com.nickdferrara.fitify.notification.internal.exception.NotificationDeliveryException
-import com.nickdferrara.fitify.notification.internal.service.EmailAddress
-import com.nickdferrara.fitify.notification.internal.service.SmtpEmailTransportAdapter
+import com.nickdferrara.fitify.notification.internal.adapter.SmtpEmailTransportAdapter
+import com.nickdferrara.fitify.notification.internal.adapter.interfaces.EmailAddress
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

@@ -1,6 +1,15 @@
 package com.nickdferrara.fitify.scheduling.internal.service
 
 import com.nickdferrara.fitify.coaching.CoachAssignedEvent
+import com.nickdferrara.fitify.scheduling.internal.exceptions.AlreadyBookedException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.BookingNotFoundException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.CancellationWindowClosedException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.ClassNotBookableException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.DailyBookingLimitExceededException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.FitnessClassNotFoundException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.ScheduleConflictException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.WaitlistEntryNotFoundException
+import com.nickdferrara.fitify.scheduling.internal.exceptions.WaitlistFullException
 import com.nickdferrara.fitify.scheduling.BookingCancelledEvent
 import com.nickdferrara.fitify.scheduling.CancelClassResult
 import com.nickdferrara.fitify.scheduling.ClassBookedEvent
@@ -19,15 +28,16 @@ import com.nickdferrara.fitify.scheduling.internal.dtos.request.UpdateClassReque
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.BookingResponse
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.ClassResponse
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.WaitlistEntryResponse
-import com.nickdferrara.fitify.scheduling.internal.dtos.response.toResponse
+import com.nickdferrara.fitify.scheduling.internal.extensions.toResponse
+import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
 import com.nickdferrara.fitify.scheduling.internal.entities.Booking
-import com.nickdferrara.fitify.scheduling.internal.entities.BookingStatus
+import com.nickdferrara.fitify.scheduling.internal.enums.BookingStatus
 import com.nickdferrara.fitify.scheduling.internal.entities.FitnessClass
-import com.nickdferrara.fitify.scheduling.internal.entities.FitnessClassStatus
+import com.nickdferrara.fitify.scheduling.internal.enums.FitnessClassStatus
 import com.nickdferrara.fitify.scheduling.internal.entities.WaitlistEntry
 import com.nickdferrara.fitify.scheduling.internal.repository.BookingRepository
 import com.nickdferrara.fitify.scheduling.internal.repository.FitnessClassRepository
-import com.nickdferrara.fitify.scheduling.internal.repository.FitnessClassSpecifications
+import com.nickdferrara.fitify.scheduling.internal.specifications.FitnessClassSpecifications
 import com.nickdferrara.fitify.scheduling.internal.repository.WaitlistEntryRepository
 import com.nickdferrara.fitify.shared.DomainError
 import com.nickdferrara.fitify.shared.NotFoundError
@@ -503,39 +513,3 @@ internal class SchedulingService(
         createdAt = createdAt!!,
     )
 }
-
-// --- Sealed result type for bookClass ---
-
-internal sealed class BookClassResult {
-    data class Booked(val booking: BookingResponse) : BookClassResult()
-    data class Waitlisted(val waitlistEntry: WaitlistEntryResponse) : BookClassResult()
-}
-
-// --- Exception classes ---
-
-internal class FitnessClassNotFoundException(id: UUID) :
-    RuntimeException("Fitness class not found: $id")
-
-internal class BookingNotFoundException(classId: UUID, userId: UUID) :
-    RuntimeException("Booking not found for class $classId and user $userId")
-
-internal class ScheduleConflictException(userId: UUID, startTime: java.time.Instant, endTime: java.time.Instant) :
-    RuntimeException("User $userId has an overlapping booking between $startTime and $endTime")
-
-internal class AlreadyBookedException(classId: UUID, userId: UUID) :
-    RuntimeException("User $userId is already booked for class $classId")
-
-internal class ClassNotBookableException(classId: UUID, reason: String) :
-    RuntimeException("Class $classId is not bookable: $reason")
-
-internal class CancellationWindowClosedException(classId: UUID, windowHours: Long) :
-    RuntimeException("Cancellation window of ${windowHours}h has closed for class $classId")
-
-internal class WaitlistFullException(classId: UUID) :
-    RuntimeException("Waitlist is full for class $classId")
-
-internal class DailyBookingLimitExceededException(userId: UUID, limit: Int) :
-    RuntimeException("User $userId has reached the daily booking limit of $limit")
-
-internal class WaitlistEntryNotFoundException(classId: UUID, userId: UUID) :
-    RuntimeException("Waitlist entry not found for class $classId and user $userId")

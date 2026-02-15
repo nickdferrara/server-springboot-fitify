@@ -3,7 +3,7 @@ package com.nickdferrara.fitify.logging.internal.aspect
 import com.nickdferrara.fitify.logging.LogExecution
 import com.nickdferrara.fitify.logging.LogLevel
 import com.nickdferrara.fitify.logging.internal.config.LoggingProperties
-import com.nickdferrara.fitify.logging.internal.service.SensitiveDataMasker
+import com.nickdferrara.fitify.logging.internal.util.SensitiveDataMasker
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect

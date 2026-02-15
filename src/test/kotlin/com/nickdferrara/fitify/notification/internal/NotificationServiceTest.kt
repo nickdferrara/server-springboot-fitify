@@ -10,9 +10,9 @@ import com.nickdferrara.fitify.notification.internal.exception.DeviceTokenNotFou
 import com.nickdferrara.fitify.notification.internal.exception.NotificationDeliveryException
 import com.nickdferrara.fitify.notification.internal.repository.DeviceTokenRepository
 import com.nickdferrara.fitify.notification.internal.repository.NotificationLogRepository
-import com.nickdferrara.fitify.notification.internal.service.NotificationChannelSender
-import com.nickdferrara.fitify.notification.internal.service.NotificationPayload
-import com.nickdferrara.fitify.notification.internal.service.NotificationPayloadFactory
+import com.nickdferrara.fitify.notification.internal.adapter.interfaces.NotificationChannelSender
+import com.nickdferrara.fitify.notification.internal.factory.NotificationPayload
+import com.nickdferrara.fitify.notification.internal.factory.NotificationPayloadFactory
 import com.nickdferrara.fitify.notification.internal.service.NotificationService
 import io.mockk.every
 import io.mockk.mockk

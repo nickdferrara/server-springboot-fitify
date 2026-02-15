@@ -1,5 +1,6 @@
 package com.nickdferrara.fitify.scheduling.internal.entities
 
+import com.nickdferrara.fitify.scheduling.internal.enums.BookingStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
