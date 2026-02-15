@@ -3,6 +3,7 @@ package com.nickdferrara.fitify.security.internal.controller
 import com.nickdferrara.fitify.security.internal.dtos.request.AssignLocationAdminRequest
 import com.nickdferrara.fitify.security.internal.dtos.response.LocationAdminAssignmentResponse
 import com.nickdferrara.fitify.security.internal.service.LocationAdminService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -24,7 +25,7 @@ internal class LocationAdminAssignmentController(
 
     @PostMapping
     fun assignLocationAdmin(
-        @RequestBody request: AssignLocationAdminRequest,
+        @Valid @RequestBody request: AssignLocationAdminRequest,
     ): ResponseEntity<LocationAdminAssignmentResponse> {
         val response = locationAdminService.assignLocationAdmin(request.keycloakId, request.locationId)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)

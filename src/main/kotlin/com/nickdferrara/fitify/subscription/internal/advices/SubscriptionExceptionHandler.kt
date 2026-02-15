@@ -3,6 +3,7 @@ package com.nickdferrara.fitify.subscription.internal.advices
 import com.nickdferrara.fitify.subscription.internal.controller.StripeWebhookController
 import com.nickdferrara.fitify.subscription.internal.controller.SubscriptionController
 import com.nickdferrara.fitify.subscription.internal.dtos.response.ErrorResponse
+import com.nickdferrara.fitify.subscription.internal.dtos.response.ValidationErrorResponse
 import com.nickdferrara.fitify.subscription.internal.exception.ActiveSubscriptionExistsException
 import com.nickdferrara.fitify.subscription.internal.exception.InvalidWebhookSignatureException
 import com.nickdferrara.fitify.subscription.internal.exception.StripeException
@@ -11,6 +12,7 @@ import com.nickdferrara.fitify.subscription.internal.exception.SubscriptionPlanN
 import com.nickdferrara.fitify.subscription.internal.exception.SubscriptionStateException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
@@ -56,5 +58,12 @@ internal class SubscriptionExceptionHandler {
     fun handleStripeException(ex: StripeException): ResponseEntity<ErrorResponse> {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
             .body(ErrorResponse(ex.message ?: "Stripe service error"))
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidation(ex: MethodArgumentNotValidException): ResponseEntity<ValidationErrorResponse> {
+        val errors = ex.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "Invalid value") }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ValidationErrorResponse("Validation failed", errors))
     }
 }

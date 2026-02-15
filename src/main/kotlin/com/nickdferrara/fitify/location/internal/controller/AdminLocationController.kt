@@ -4,6 +4,7 @@ import com.nickdferrara.fitify.location.internal.dtos.request.CreateLocationRequ
 import com.nickdferrara.fitify.location.internal.dtos.request.UpdateLocationRequest
 import com.nickdferrara.fitify.location.internal.dtos.response.LocationResponse
 import com.nickdferrara.fitify.location.internal.service.LocationService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -25,7 +26,7 @@ internal class AdminLocationController(
 ) {
 
     @PostMapping
-    fun createLocation(@RequestBody request: CreateLocationRequest): ResponseEntity<LocationResponse> {
+    fun createLocation(@Valid @RequestBody request: CreateLocationRequest): ResponseEntity<LocationResponse> {
         val response = locationService.createLocation(request)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
@@ -43,7 +44,7 @@ internal class AdminLocationController(
     @PutMapping("/{locationId}")
     fun updateLocation(
         @PathVariable locationId: UUID,
-        @RequestBody request: UpdateLocationRequest,
+        @Valid @RequestBody request: UpdateLocationRequest,
     ): ResponseEntity<LocationResponse> {
         return ResponseEntity.ok(locationService.updateLocation(locationId, request))
     }

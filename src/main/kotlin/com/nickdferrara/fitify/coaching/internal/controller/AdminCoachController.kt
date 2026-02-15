@@ -5,6 +5,7 @@ import com.nickdferrara.fitify.coaching.internal.dtos.request.CreateCoachRequest
 import com.nickdferrara.fitify.coaching.internal.dtos.request.UpdateCoachRequest
 import com.nickdferrara.fitify.coaching.internal.dtos.response.CoachResponse
 import com.nickdferrara.fitify.coaching.internal.service.CoachingService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -26,7 +27,7 @@ internal class AdminCoachController(
 ) {
 
     @PostMapping
-    fun createCoach(@RequestBody request: CreateCoachRequest): ResponseEntity<CoachResponse> {
+    fun createCoach(@Valid @RequestBody request: CreateCoachRequest): ResponseEntity<CoachResponse> {
         val response = coachingService.createCoach(request)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
@@ -44,7 +45,7 @@ internal class AdminCoachController(
     @PutMapping("/{coachId}")
     fun updateCoach(
         @PathVariable coachId: UUID,
-        @RequestBody request: UpdateCoachRequest,
+        @Valid @RequestBody request: UpdateCoachRequest,
     ): ResponseEntity<CoachResponse> {
         return ResponseEntity.ok(coachingService.updateCoach(coachId, request))
     }
@@ -58,7 +59,7 @@ internal class AdminCoachController(
     @PutMapping("/{coachId}/locations")
     fun assignLocations(
         @PathVariable coachId: UUID,
-        @RequestBody request: AssignCoachLocationsRequest,
+        @Valid @RequestBody request: AssignCoachLocationsRequest,
     ): ResponseEntity<CoachResponse> {
         return ResponseEntity.ok(coachingService.assignLocations(coachId, request))
     }

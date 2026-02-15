@@ -7,6 +7,7 @@ import com.nickdferrara.fitify.subscription.internal.dtos.response.CheckoutRespo
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionPlanResponse
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionResponse
 import com.nickdferrara.fitify.subscription.internal.service.SubscriptionService
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -31,7 +32,7 @@ internal class SubscriptionController(
     @PostMapping("/checkout")
     fun createCheckoutSession(
         @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody request: CheckoutRequest,
+        @Valid @RequestBody request: CheckoutRequest,
     ): ResponseEntity<CheckoutResponse> {
         val userId = UUID.fromString(jwt.subject)
         return ResponseEntity.ok(subscriptionService.createCheckoutSession(userId, request))
@@ -56,7 +57,7 @@ internal class SubscriptionController(
     @PostMapping("/me/change-plan")
     fun changePlan(
         @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody request: ChangePlanRequest,
+        @Valid @RequestBody request: ChangePlanRequest,
     ): ResponseEntity<CheckoutResponse> {
         val userId = UUID.fromString(jwt.subject)
         return ResponseEntity.ok(subscriptionService.changePlan(userId, request))

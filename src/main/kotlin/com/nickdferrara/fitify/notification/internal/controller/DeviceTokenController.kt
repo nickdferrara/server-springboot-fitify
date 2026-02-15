@@ -5,6 +5,7 @@ import com.nickdferrara.fitify.notification.internal.dtos.response.DeviceTokenRe
 import com.nickdferrara.fitify.notification.internal.dtos.response.NotificationLogResponse
 import com.nickdferrara.fitify.notification.internal.dtos.response.toResponse
 import com.nickdferrara.fitify.notification.internal.service.NotificationService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,7 +27,7 @@ internal class DeviceTokenController(
 
     @PostMapping("/devices")
     fun registerDeviceToken(
-        @RequestBody request: RegisterDeviceTokenRequest,
+        @Valid @RequestBody request: RegisterDeviceTokenRequest,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Void> {
         val userId = UUID.fromString(jwt.subject)

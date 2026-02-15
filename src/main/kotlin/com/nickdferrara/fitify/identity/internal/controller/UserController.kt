@@ -3,6 +3,7 @@ package com.nickdferrara.fitify.identity.internal.controller
 import com.nickdferrara.fitify.identity.internal.IdentityService
 import com.nickdferrara.fitify.identity.internal.dtos.request.UpdatePreferencesRequest
 import com.nickdferrara.fitify.identity.internal.dtos.response.UserPreferencesResponse
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -26,7 +27,7 @@ internal class UserController(
     @PatchMapping("/preferences")
     fun updatePreferences(
         @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody request: UpdatePreferencesRequest,
+        @Valid @RequestBody request: UpdatePreferencesRequest,
     ): ResponseEntity<UserPreferencesResponse> {
         return ResponseEntity.ok(identityService.updatePreferences(jwt.subject, request))
     }

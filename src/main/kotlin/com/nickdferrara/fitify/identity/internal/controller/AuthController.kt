@@ -6,6 +6,7 @@ import com.nickdferrara.fitify.identity.internal.dtos.request.ResetPasswordReque
 import com.nickdferrara.fitify.identity.internal.dtos.response.MessageResponse
 import com.nickdferrara.fitify.identity.internal.dtos.response.RegisterResponse
 import com.nickdferrara.fitify.identity.internal.service.AuthService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,18 +21,18 @@ internal class AuthController(
 ) {
 
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<RegisterResponse> {
+    fun register(@Valid @RequestBody request: RegisterRequest): ResponseEntity<RegisterResponse> {
         val response = authService.register(request)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
     @PostMapping("/forgot-password")
-    fun forgotPassword(@RequestBody request: ForgotPasswordRequest): ResponseEntity<MessageResponse> {
+    fun forgotPassword(@Valid @RequestBody request: ForgotPasswordRequest): ResponseEntity<MessageResponse> {
         return ResponseEntity.ok(authService.forgotPassword(request))
     }
 
     @PostMapping("/reset-password")
-    fun resetPassword(@RequestBody request: ResetPasswordRequest): ResponseEntity<MessageResponse> {
+    fun resetPassword(@Valid @RequestBody request: ResetPasswordRequest): ResponseEntity<MessageResponse> {
         return ResponseEntity.ok(authService.resetPassword(request))
     }
 }
