@@ -67,6 +67,16 @@ fitify:
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_placeholder}
     success-url: ${STRIPE_SUCCESS_URL:http://localhost:3000/subscription/success}
     cancel-url: ${STRIPE_CANCEL_URL:http://localhost:3000/subscription/cancel}
+  logging:
+    correlation-header: X-Correlation-ID
+    aop:
+      controller-logging: true
+      service-logging: true
+      mask-sensitive-fields: true
+    audit:
+      enabled: true
+      retention-days: 90
+      async: true
 
 server:
   port: 8080

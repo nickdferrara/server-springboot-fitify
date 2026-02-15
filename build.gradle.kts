@@ -50,6 +50,12 @@ dependencies {
     // Stripe
     implementation("com.stripe:stripe-java:28.2.0")
 
+    // AOP
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+
+    // Logging
+    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+
     // Notification
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("com.google.firebase:firebase-admin:9.4.3")
@@ -114,6 +120,7 @@ val modulePackages = mapOf(
     "security" to "com/nickdferrara/fitify/security/**",
     "shared" to "com/nickdferrara/fitify/shared/**",
     "subscription" to "com/nickdferrara/fitify/subscription/**",
+    "logging" to "com/nickdferrara/fitify/logging/**",
 )
 
 val commonExcludes = listOf(
@@ -125,6 +132,8 @@ val commonExcludes = listOf(
     "**/*Advice*",
     "**/entities/**",
     "**/dtos/**",
+    "**/*Aspect*",
+    "**/*Filter*",
 )
 
 tasks.jacocoTestCoverageVerification {

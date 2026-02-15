@@ -1,0 +1,140 @@
+{
+  "uid": "fitify-notifications",
+  "title": "Notifications",
+  "tags": ["fitify", "notifications"],
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "options": [],
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Notification Delivery Logs",
+      "type": "logs",
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "{module=\"notification\"} |~ \"(?i)(deliver|send|sent|email|sms|push|dispatch)\" | json",
+          "maxLines": 200
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Notification Errors",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineWidth": 2
+          },
+          "color": {"fixedColor": "red", "mode": "fixed"},
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"notification\", level=\"ERROR\"} [$__interval]))",
+          "legendFormat": "Errors"
+        },
+        {
+          "refId": "B",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"notification\", level=\"WARN\"} [$__interval]))",
+          "legendFormat": "Warnings"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Delivery Success / Failure Rate",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 40,
+            "stacking": {"mode": "normal"}
+          },
+          "color": {"mode": "palette-classic"},
+          "unit": "short"
+        },
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Delivered"}, "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]},
+          {"matcher": {"id": "byName", "options": "Failed"}, "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]}
+        ]
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"notification\"} |~ \"(?i)(delivered|sent|success)\" [$__interval]))",
+          "legendFormat": "Delivered"
+        },
+        {
+          "refId": "B",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"notification\"} |~ \"(?i)(fail|error|bounce|reject)\" [$__interval]))",
+          "legendFormat": "Failed"
+        }
+      ]
+    }
+  ]
+}

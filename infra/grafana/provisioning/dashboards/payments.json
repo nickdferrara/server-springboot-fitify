@@ -1,0 +1,166 @@
+{
+  "uid": "fitify-payments",
+  "title": "Payments",
+  "tags": ["fitify", "payments", "subscription"],
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "options": [],
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Payment & Subscription Errors",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineWidth": 2
+          },
+          "color": {"fixedColor": "red", "mode": "fixed"},
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"subscription\", level=\"ERROR\"} |~ \"(?i)(payment|stripe|charge|invoice|billing)\" [$__interval]))",
+          "legendFormat": "Payment Errors"
+        },
+        {
+          "refId": "B",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"subscription\", level=\"WARN\"} |~ \"(?i)(payment|stripe|charge|invoice|billing)\" [$__interval]))",
+          "legendFormat": "Payment Warnings"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Stripe Webhook Events",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 40,
+            "stacking": {"mode": "normal"}
+          },
+          "color": {"mode": "palette-classic"},
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum by (level) (count_over_time({module=\"subscription\"} |~ \"(?i)(webhook|stripe.*event)\" [$__interval]))",
+          "legendFormat": "{{level}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Payment Failure Rate",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2
+          },
+          "color": {"mode": "palette-classic"},
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Failure Rate"}, "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]}
+        ]
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"subscription\", level=\"ERROR\"} |~ \"(?i)(payment|charge|invoice)\" [$__interval])) / (sum (count_over_time({module=\"subscription\"} |~ \"(?i)(payment|charge|invoice)\" [$__interval])) > 0)",
+          "legendFormat": "Failure Rate"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Payment Event Logs",
+      "type": "logs",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "{module=\"subscription\"} |~ \"(?i)(payment|stripe|charge|invoice|webhook|billing)\" | json",
+          "maxLines": 200
+        }
+      ]
+    }
+  ]
+}

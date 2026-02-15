@@ -1,0 +1,140 @@
+{
+  "uid": "fitify-scheduling",
+  "title": "Scheduling",
+  "tags": ["fitify", "scheduling"],
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "options": [],
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Booking Activity Logs",
+      "type": "logs",
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "{module=\"scheduling\"} |~ \"(?i)(book|cancel|reschedule|appointment|session|class|slot)\" | json",
+          "maxLines": 200
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Scheduling Errors",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineWidth": 2
+          },
+          "color": {"fixedColor": "red", "mode": "fixed"},
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"scheduling\", level=\"ERROR\"} [$__interval]))",
+          "legendFormat": "Errors"
+        },
+        {
+          "refId": "B",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"scheduling\", level=\"WARN\"} [$__interval]))",
+          "legendFormat": "Warnings"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Class Booking Volume",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
+      "datasource": {"type": "loki", "uid": "${datasource}"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 40,
+            "stacking": {"mode": "normal"}
+          },
+          "color": {"mode": "palette-classic"},
+          "unit": "short"
+        },
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "Bookings"}, "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]},
+          {"matcher": {"id": "byName", "options": "Cancellations"}, "properties": [{"id": "color", "value": {"fixedColor": "yellow", "mode": "fixed"}}]}
+        ]
+      },
+      "options": {
+        "tooltip": {"mode": "multi"},
+        "legend": {"displayMode": "list", "placement": "bottom"}
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"scheduling\"} |~ \"(?i)(booked|created|confirmed|scheduled)\" [$__interval]))",
+          "legendFormat": "Bookings"
+        },
+        {
+          "refId": "B",
+          "datasource": {"type": "loki", "uid": "${datasource}"},
+          "expr": "sum (count_over_time({module=\"scheduling\"} |~ \"(?i)(cancel|cancelled|canceled)\" [$__interval]))",
+          "legendFormat": "Cancellations"
+        }
+      ]
+    }
+  ]
+}

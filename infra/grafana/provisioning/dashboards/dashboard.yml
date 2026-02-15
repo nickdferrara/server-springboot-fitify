@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: 'Fitify Dashboards'
+    orgId: 1
+    folder: 'Fitify'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false
