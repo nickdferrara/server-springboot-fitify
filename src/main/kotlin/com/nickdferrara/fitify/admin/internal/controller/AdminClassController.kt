@@ -7,6 +7,7 @@ import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateClassRequest
 import com.nickdferrara.fitify.admin.internal.dtos.response.AdminClassResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.CancelClassResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.RecurringScheduleResponse
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -30,7 +31,7 @@ internal class AdminClassController(
     @PreAuthorize("@locationAdminService.hasAccess(authentication, #locationId)")
     fun createClass(
         @PathVariable locationId: UUID,
-        @RequestBody request: CreateClassRequest,
+        @Valid @RequestBody request: CreateClassRequest,
     ): ResponseEntity<AdminClassResponse> {
         val response = adminService.createClass(locationId, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
@@ -48,7 +49,7 @@ internal class AdminClassController(
     @PreAuthorize("hasRole('ADMIN')")
     fun updateClass(
         @PathVariable classId: UUID,
-        @RequestBody request: UpdateClassRequest,
+        @Valid @RequestBody request: UpdateClassRequest,
     ): ResponseEntity<AdminClassResponse> {
         return ResponseEntity.ok(adminService.updateClass(classId, request))
     }
@@ -64,7 +65,7 @@ internal class AdminClassController(
     @PreAuthorize("@locationAdminService.hasAccess(authentication, #locationId)")
     fun createRecurringSchedule(
         @PathVariable locationId: UUID,
-        @RequestBody request: CreateRecurringScheduleRequest,
+        @Valid @RequestBody request: CreateRecurringScheduleRequest,
     ): ResponseEntity<RecurringScheduleResponse> {
         val response = adminService.createRecurringSchedule(locationId, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)

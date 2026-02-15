@@ -3,6 +3,7 @@ package com.nickdferrara.fitify.admin.internal.controller
 import com.nickdferrara.fitify.admin.internal.AdminService
 import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateBusinessRuleRequest
 import com.nickdferrara.fitify.admin.internal.dtos.response.BusinessRuleResponse
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -29,7 +30,7 @@ internal class AdminBusinessRuleController(
     @PutMapping("/{ruleKey}")
     fun updateBusinessRule(
         @PathVariable ruleKey: String,
-        @RequestBody request: UpdateBusinessRuleRequest,
+        @Valid @RequestBody request: UpdateBusinessRuleRequest,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<BusinessRuleResponse> {
         val updatedBy = jwt.subject
