@@ -11,8 +11,10 @@ import com.nickdferrara.fitify.identity.internal.dtos.response.toRegisterRespons
 import com.nickdferrara.fitify.identity.internal.entities.PasswordResetToken
 import com.nickdferrara.fitify.identity.internal.entities.User
 import com.nickdferrara.fitify.identity.internal.exception.EmailAlreadyExistsException
+import com.nickdferrara.fitify.identity.internal.exception.IdentityProviderConflictException
 import com.nickdferrara.fitify.identity.internal.exception.InvalidTokenException
 import com.nickdferrara.fitify.identity.internal.exception.WeakPasswordException
+import com.nickdferrara.fitify.identity.internal.gateway.IdentityProviderGateway
 import com.nickdferrara.fitify.identity.internal.repository.PasswordResetTokenRepository
 import com.nickdferrara.fitify.identity.internal.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
@@ -29,7 +31,7 @@ import java.util.Base64
 internal class AuthService(
     private val userRepository: UserRepository,
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
-    private val keycloakClient: KeycloakClient,
+    private val identityProvider: IdentityProviderGateway,
     private val eventPublisher: ApplicationEventPublisher,
     @Value("\${fitify.security.token-pepper}") private val tokenPepper: String,
 ) {
@@ -48,13 +50,13 @@ internal class AuthService(
         }
 
         val keycloakId = try {
-            keycloakClient.createUser(
+            identityProvider.createUser(
                 email = request.email,
                 password = request.password,
                 firstName = request.firstName,
                 lastName = request.lastName,
             )
-        } catch (e: KeycloakConflictException) {
+        } catch (e: IdentityProviderConflictException) {
             throw EmailAlreadyExistsException(request.email)
         }
 
@@ -136,8 +138,8 @@ internal class AuthService(
         val user = userRepository.findById(resetToken.userId)
             .orElseThrow { InvalidTokenException("token not found") }
 
-        keycloakClient.updatePassword(user.keycloakId, request.newPassword)
-        keycloakClient.invalidateSessions(user.keycloakId)
+        identityProvider.updatePassword(user.keycloakId, request.newPassword)
+        identityProvider.invalidateSessions(user.keycloakId)
 
         resetToken.usedAt = Instant.now()
         passwordResetTokenRepository.save(resetToken)

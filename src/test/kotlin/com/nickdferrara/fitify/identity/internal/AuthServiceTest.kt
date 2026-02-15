@@ -8,13 +8,13 @@ import com.nickdferrara.fitify.identity.internal.dtos.request.ResetPasswordReque
 import com.nickdferrara.fitify.identity.internal.entities.PasswordResetToken
 import com.nickdferrara.fitify.identity.internal.entities.User
 import com.nickdferrara.fitify.identity.internal.exception.EmailAlreadyExistsException
+import com.nickdferrara.fitify.identity.internal.exception.IdentityProviderConflictException
 import com.nickdferrara.fitify.identity.internal.exception.InvalidTokenException
 import com.nickdferrara.fitify.identity.internal.exception.WeakPasswordException
+import com.nickdferrara.fitify.identity.internal.gateway.IdentityProviderGateway
 import com.nickdferrara.fitify.identity.internal.repository.PasswordResetTokenRepository
 import com.nickdferrara.fitify.identity.internal.repository.UserRepository
 import com.nickdferrara.fitify.identity.internal.service.AuthService
-import com.nickdferrara.fitify.identity.internal.service.KeycloakClient
-import com.nickdferrara.fitify.identity.internal.service.KeycloakConflictException
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -34,10 +34,10 @@ class AuthServiceTest {
 
     private val userRepository = mockk<UserRepository>()
     private val passwordResetTokenRepository = mockk<PasswordResetTokenRepository>()
-    private val keycloakClient = mockk<KeycloakClient>()
+    private val identityProvider = mockk<IdentityProviderGateway>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
     private val tokenPepper = "test-pepper"
-    private val authService = AuthService(userRepository, passwordResetTokenRepository, keycloakClient, eventPublisher, tokenPepper)
+    private val authService = AuthService(userRepository, passwordResetTokenRepository, identityProvider, eventPublisher, tokenPepper)
 
     private fun buildUser(
         id: UUID = UUID.randomUUID(),
@@ -67,7 +67,7 @@ class AuthServiceTest {
         val savedId = UUID.randomUUID()
 
         every { userRepository.existsByEmail(request.email) } returns false
-        every { keycloakClient.createUser(request.email, request.password, request.firstName, request.lastName) } returns keycloakId
+        every { identityProvider.createUser(request.email, request.password, request.firstName, request.lastName) } returns keycloakId
         every { userRepository.save(any()) } answers {
             val u = firstArg<User>()
             User(
@@ -117,7 +117,7 @@ class AuthServiceTest {
         )
 
         every { userRepository.existsByEmail(request.email) } returns false
-        every { keycloakClient.createUser(any(), any(), any(), any()) } throws KeycloakConflictException("exists")
+        every { identityProvider.createUser(any(), any(), any(), any()) } throws IdentityProviderConflictException("exists")
 
         assertThrows<EmailAlreadyExistsException> {
             authService.register(request)
@@ -187,15 +187,15 @@ class AuthServiceTest {
         // we mock the repository to return the token for any hash.
         every { passwordResetTokenRepository.findByTokenHash(any()) } returns Optional.of(resetToken)
         every { userRepository.findById(user.id!!) } returns Optional.of(user)
-        every { keycloakClient.updatePassword(user.keycloakId, "NewStrong1@pass") } returns Unit
-        every { keycloakClient.invalidateSessions(user.keycloakId) } returns Unit
+        every { identityProvider.updatePassword(user.keycloakId, "NewStrong1@pass") } returns Unit
+        every { identityProvider.invalidateSessions(user.keycloakId) } returns Unit
         every { passwordResetTokenRepository.save(any()) } answers { firstArg() }
 
         val response = authService.resetPassword(ResetPasswordRequest("raw-token", "NewStrong1@pass"))
 
         assertNotNull(response.message)
-        verify { keycloakClient.updatePassword(user.keycloakId, "NewStrong1@pass") }
-        verify { keycloakClient.invalidateSessions(user.keycloakId) }
+        verify { identityProvider.updatePassword(user.keycloakId, "NewStrong1@pass") }
+        verify { identityProvider.invalidateSessions(user.keycloakId) }
     }
 
     @Test
