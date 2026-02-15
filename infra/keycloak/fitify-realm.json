@@ -1,0 +1,75 @@
+{
+  "realm": "fitify",
+  "enabled": true,
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "sslRequired": "external",
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Full system administrator"
+      },
+      {
+        "name": "LOCATION_ADMIN",
+        "description": "Manages a single gym location"
+      },
+      {
+        "name": "COACH",
+        "description": "Personal trainer / coach"
+      },
+      {
+        "name": "CLIENT",
+        "description": "Gym member / client"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "fitify-api",
+      "name": "Fitify API",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "fitify-dev-secret",
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": false,
+      "authorizationServicesEnabled": false,
+      "fullScopeAllowed": true
+    }
+  ],
+  "users": [
+    {
+      "username": "admin@fitify.com",
+      "email": "admin@fitify.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    },
+    {
+      "username": "service-account-fitify-api",
+      "enabled": true,
+      "serviceAccountClientId": "fitify-api",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users"
+        ]
+      }
+    }
+  ]
+}
