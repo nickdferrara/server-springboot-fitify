@@ -21,7 +21,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: fitify-keycloak
-    command: start-dev
+    command: start-dev --import-realm
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fitify}
@@ -32,9 +32,26 @@ services:
       KC_HTTP_PORT: 8180
     ports:
       - "8180:8180"
+    volumes:
+      - ./infra/keycloak/fitify-realm.json:/opt/keycloak/data/import/fitify-realm.json:ro
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - fitify-network
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8180 && echo done"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: fitify-mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
     networks:
       - fitify-network
 
@@ -47,13 +64,28 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-fitify}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-fitify}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/fitify
+      FITIFY_KEYCLOAK_SERVER_URL: http://keycloak:8180
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-fitify-dev-secret}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dGVzdC1rZXktMzItYnl0ZXMtbG9uZy4u}
+      TOKEN_PEPPER: ${TOKEN_PEPPER:-dev-pepper-value-change-in-prod}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_placeholder}
+      STRIPE_SUCCESS_URL: ${STRIPE_SUCCESS_URL:-http://localhost:3000/subscription/success}
+      STRIPE_CANCEL_URL: ${STRIPE_CANCEL_URL:-http://localhost:3000/subscription/cancel}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      NOTIFICATION_FROM_EMAIL: ${NOTIFICATION_FROM_EMAIL:-noreply@fitify.com}
+      NOTIFICATION_FROM_NAME: ${NOTIFICATION_FROM_NAME:-Fitify}
+      FIREBASE_SERVICE_ACCOUNT_PATH: ${FIREBASE_SERVICE_ACCOUNT_PATH:-}
     ports:
       - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_started
+        condition: service_healthy
     networks:
       - fitify-network
 

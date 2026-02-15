@@ -22,10 +22,7 @@ fitify:
   firebase:
     service-account-path: ""
   keycloak:
-    server-url: http://localhost:8180
-    realm: fitify
-    client-id: fitify-api
-    client-secret: dev-secret
+    client-secret: fitify-dev-secret
   stripe:
     secret-key: sk_test_dev_placeholder
     webhook-secret: whsec_dev_placeholder
