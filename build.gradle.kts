@@ -61,10 +61,14 @@ dependencies {
     testImplementation("org.springframework.modulith:spring-modulith-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.assertj:assertj-core:3.26.3")
     testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation("com.github.dasniko:testcontainers-keycloak:3.5.1")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -99,12 +103,45 @@ tasks.jacocoTestReport {
     }
 }
 
+val modulePackages = mapOf(
+    "admin" to "com/nickdferrara/fitify/admin/**",
+    "coaching" to "com/nickdferrara/fitify/coaching/**",
+    "identity" to "com/nickdferrara/fitify/identity/**",
+    "location" to "com/nickdferrara/fitify/location/**",
+    "notification" to "com/nickdferrara/fitify/notification/**",
+    "scheduling" to "com/nickdferrara/fitify/scheduling/**",
+    "security" to "com/nickdferrara/fitify/security/**",
+    "shared" to "com/nickdferrara/fitify/shared/**",
+    "subscription" to "com/nickdferrara/fitify/subscription/**",
+)
+
+val commonExcludes = listOf(
+    "**/*Dto*",
+    "**/*Request*",
+    "**/*Response*",
+    "**/*Config*",
+    "**/*Properties*",
+    "**/*Advice*",
+    "**/entities/**",
+    "**/dtos/**",
+)
+
 tasks.jacocoTestCoverageVerification {
     violationRules {
-        rule {
-            limit {
-                minimum = "0.80".toBigDecimal()
+        modulePackages.forEach { (_, includePattern) ->
+            rule {
+                element = "BUNDLE"
+                includes = listOf(includePattern)
+                excludes = commonExcludes
+                limit {
+                    counter = "LINE"
+                    minimum = "0.80".toBigDecimal()
+                }
             }
         }
     }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }

@@ -1,0 +1,40 @@
+{
+  "realm": "fitify-test",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "fitify-api",
+      "enabled": true,
+      "secret": "test-secret",
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "redirectUris": ["*"],
+      "webOrigins": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser@fitify.com",
+      "email": "testuser@fitify.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test-password",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      { "name": "user" },
+      { "name": "admin" }
+    ]
+  }
+}
