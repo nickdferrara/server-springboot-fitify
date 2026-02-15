@@ -55,6 +55,10 @@ fitify:
   notification:
     from-email: ${NOTIFICATION_FROM_EMAIL:noreply@fitify.com}
     from-name: ${NOTIFICATION_FROM_NAME:Fitify}
+    email:
+      provider: ${EMAIL_PROVIDER:smtp}
+    sendgrid:
+      api-key: ${SENDGRID_API_KEY:}
   firebase:
     service-account-path: ${FIREBASE_SERVICE_ACCOUNT_PATH:}
   keycloak:

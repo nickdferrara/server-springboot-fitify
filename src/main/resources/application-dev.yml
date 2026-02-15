@@ -17,6 +17,8 @@ fitify:
   notification:
     from-email: noreply@fitify.local
     from-name: Fitify Dev
+    email:
+      provider: smtp
   firebase:
     service-account-path: ""
   keycloak:
