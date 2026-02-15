@@ -1,9 +1,11 @@
 package com.nickdferrara.fitify.subscription.internal.service
 
+import com.nickdferrara.fitify.identity.UserRegisteredEvent
 import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
 internal class SubscriptionEventListener {
@@ -20,5 +22,10 @@ internal class SubscriptionEventListener {
                 logger.info("Business rule updated: discount_stacking_enabled = {}", event.newValue)
             }
         }
+    }
+
+    @TransactionalEventListener
+    fun onUserRegistered(event: UserRegisteredEvent) {
+        logger.info("New user {} registered, evaluating trial provisioning", event.userId)
     }
 }

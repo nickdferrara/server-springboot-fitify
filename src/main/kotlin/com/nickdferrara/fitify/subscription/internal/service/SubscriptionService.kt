@@ -254,6 +254,7 @@ internal class SubscriptionService(
                     userId = saved.userId,
                     planType = saved.planType.name,
                     stripeSubscriptionId = stripeSubscriptionId,
+                    expiresAt = saved.currentPeriodEnd!!,
                 )
             )
         } catch (e: com.stripe.exception.StripeException) {
@@ -291,6 +292,7 @@ internal class SubscriptionService(
                     subscriptionId = subscription.id!!,
                     userId = subscription.userId,
                     newPeriodEnd = subscription.currentPeriodEnd!!,
+                    planType = subscription.planType.name,
                 )
             )
         } catch (e: com.stripe.exception.StripeException) {

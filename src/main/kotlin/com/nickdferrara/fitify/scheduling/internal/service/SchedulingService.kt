@@ -1,5 +1,6 @@
 package com.nickdferrara.fitify.scheduling.internal.service
 
+import com.nickdferrara.fitify.coaching.CoachAssignedEvent
 import com.nickdferrara.fitify.scheduling.BookingCancelledEvent
 import com.nickdferrara.fitify.scheduling.CancelClassResult
 import com.nickdferrara.fitify.scheduling.ClassBookedEvent
@@ -100,6 +101,15 @@ internal class SchedulingService(
         command.capacity?.let { fitnessClass.capacity = it; updatedFields.add("capacity") }
 
         val saved = fitnessClassRepository.save(fitnessClass)
+
+        if ("coachId" in updatedFields && command.coachId != null) {
+            eventPublisher.publishEvent(
+                CoachAssignedEvent(
+                    coachId = command.coachId!!,
+                    classId = classId,
+                )
+            )
+        }
 
         if (updatedFields.any { it in listOf("startTime", "endTime", "capacity") }) {
             val affectedUserIds = bookingRepository

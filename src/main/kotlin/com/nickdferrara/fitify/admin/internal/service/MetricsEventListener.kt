@@ -4,6 +4,8 @@ import com.nickdferrara.fitify.admin.internal.entities.MetricType
 import com.nickdferrara.fitify.admin.internal.entities.MetricsSnapshot
 import com.nickdferrara.fitify.admin.internal.repository.MetricsSnapshotRepository
 import com.nickdferrara.fitify.identity.UserRegisteredEvent
+import com.nickdferrara.fitify.location.LocationCreatedEvent
+import com.nickdferrara.fitify.notification.NotificationSentEvent
 import com.nickdferrara.fitify.scheduling.BookingCancelledEvent
 import com.nickdferrara.fitify.scheduling.SchedulingApi
 import com.nickdferrara.fitify.scheduling.WaitlistPromotedEvent
@@ -81,6 +83,28 @@ internal class MetricsEventListener(
                 incrementMetric(MetricType.WAITLIST_CONVERSION, locationId = null, dimensions = emptyMap())
             }
         }
+    }
+
+    @EventListener
+    @Transactional
+    fun onLocationCreated(event: LocationCreatedEvent) {
+        log.debug("Metrics: recording new location {}", event.locationId)
+        incrementMetric(
+            MetricType.LOCATIONS,
+            locationId = event.locationId,
+            dimensions = mapOf("time_zone" to event.timeZone),
+        )
+    }
+
+    @EventListener
+    @Transactional
+    fun onNotificationSent(event: NotificationSentEvent) {
+        log.debug("Metrics: recording notification {} via {}", event.notificationId, event.channel)
+        incrementMetric(
+            MetricType.NOTIFICATIONS_SENT,
+            locationId = null,
+            dimensions = mapOf("channel" to event.channel, "status" to event.status),
+        )
     }
 
     private fun incrementMetric(

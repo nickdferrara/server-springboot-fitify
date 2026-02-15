@@ -8,4 +8,6 @@ internal enum class MetricType {
     CLASS_UTILIZATION,
     WAITLIST_CONVERSION,
     CHURN_RATE,
+    LOCATIONS,
+    NOTIFICATIONS_SENT,
 }

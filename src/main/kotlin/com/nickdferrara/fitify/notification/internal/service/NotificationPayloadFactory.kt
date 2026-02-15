@@ -34,7 +34,7 @@ internal class NotificationPayloadFactory {
 
     fun fromPasswordResetRequested(event: PasswordResetRequestedEvent) = NotificationPayload(
         subject = "Reset your password",
-        body = "Use the following token to reset your password: ${event.resetToken}. It expires in ${event.expiresInMinutes} minutes.",
+        body = "Click the following link to reset your password: ${event.resetLink}. It expires at ${event.expiresAt}.",
         channels = setOf(NotificationChannel.EMAIL),
         data = mapOf("email" to event.email),
     )

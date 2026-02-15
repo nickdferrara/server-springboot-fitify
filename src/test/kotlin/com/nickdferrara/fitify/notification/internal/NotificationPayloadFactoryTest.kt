@@ -36,14 +36,14 @@ class NotificationPayloadFactoryTest {
 
     @Test
     fun `fromPasswordResetRequested creates email-only payload`() {
-        val event = PasswordResetRequestedEvent(userId, "test@example.com", "reset-token-123", 30)
+        val event = PasswordResetRequestedEvent(userId, "test@example.com", "/reset-password?token=reset-token-123", Instant.now().plusSeconds(1800))
 
         val payload = factory.fromPasswordResetRequested(event)
 
         assertEquals("Reset your password", payload.subject)
         assertEquals(setOf(NotificationChannel.EMAIL), payload.channels)
         assertEquals("test@example.com", payload.data["email"])
-        assertTrue(payload.body.contains("reset-token-123"))
+        assertTrue(payload.body.contains("/reset-password?token=reset-token-123"))
     }
 
     @Test
@@ -84,7 +84,7 @@ class NotificationPayloadFactoryTest {
     @Test
     fun `fromSubscriptionCreated creates push and email payload`() {
         val subscriptionId = UUID.randomUUID()
-        val event = SubscriptionCreatedEvent(subscriptionId, userId, "premium", "sub_123")
+        val event = SubscriptionCreatedEvent(subscriptionId, userId, "premium", "sub_123", Instant.now().plusSeconds(86400))
 
         val payload = factory.fromSubscriptionCreated(event)
 
@@ -96,7 +96,7 @@ class NotificationPayloadFactoryTest {
     @Test
     fun `fromSubscriptionRenewed creates push and email payload`() {
         val subscriptionId = UUID.randomUUID()
-        val event = SubscriptionRenewedEvent(subscriptionId, userId, Instant.now())
+        val event = SubscriptionRenewedEvent(subscriptionId, userId, Instant.now(), "MONTHLY")
 
         val payload = factory.fromSubscriptionRenewed(event)
 
