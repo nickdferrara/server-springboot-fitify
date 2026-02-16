@@ -9,7 +9,7 @@ import com.nickdferrara.fitify.coaching.internal.dtos.request.AssignCoachLocatio
 import com.nickdferrara.fitify.coaching.internal.dtos.request.CreateCoachRequest
 import com.nickdferrara.fitify.coaching.internal.dtos.request.UpdateCoachRequest
 import com.nickdferrara.fitify.coaching.internal.dtos.response.CoachResponse
-import com.nickdferrara.fitify.coaching.internal.dtos.response.toResponse
+import com.nickdferrara.fitify.coaching.internal.dtos.extensions.toResponse
 import com.nickdferrara.fitify.coaching.internal.entities.Coach
 import com.nickdferrara.fitify.coaching.internal.entities.CoachCertification
 import com.nickdferrara.fitify.coaching.internal.entities.CoachLocation
