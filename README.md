@@ -1,6 +1,10 @@
-# Fitify
+# Fitify Fitness Platform
 
-Fitness platform backend built with **Kotlin**, **Spring Boot 3**, and **Spring Modulith**. Manages coaching, scheduling, subscriptions, locations, and identity through a modular monolith architecture.
+**Tired of paying too much for fitness platforms that don't meet your needs?** Wish you could have your own software without the price tag of custom development? Fitify is a free, open-source fitness platform backend that gives you the same features as expensive monthly subscriptions — coaching, scheduling, subscriptions, location management, and more — without the recurring cost.
+
+Fitify is built to be **extended to fit your needs**. Connect it to a mobile app for iOS or Android, a web-based admin dashboard, or both. You own the software, you own the data, and you decide how it grows.
+
+Built with **Kotlin**, **Spring Boot 3**, and **Spring Modulith** using a modular monolith architecture.
 
 ## Quick Start
 
