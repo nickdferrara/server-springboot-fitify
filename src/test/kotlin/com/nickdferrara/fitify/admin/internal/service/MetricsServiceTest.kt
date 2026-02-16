@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.admin.internal.service
 
-import com.nickdferrara.fitify.admin.internal.entities.Granularity
-import com.nickdferrara.fitify.admin.internal.entities.MetricType
+import com.nickdferrara.fitify.admin.internal.entities.enums.Granularity
+import com.nickdferrara.fitify.admin.internal.entities.enums.MetricType
 import com.nickdferrara.fitify.admin.internal.entities.MetricsSnapshot
 import com.nickdferrara.fitify.admin.internal.exceptions.InvalidMetricsQueryException
 import com.nickdferrara.fitify.admin.internal.repository.MetricsSnapshotRepository

@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.admin.internal.repository
 
-import com.nickdferrara.fitify.admin.internal.entities.MetricType
+import com.nickdferrara.fitify.admin.internal.entities.enums.MetricType
 import com.nickdferrara.fitify.admin.internal.entities.MetricsSnapshot
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDate

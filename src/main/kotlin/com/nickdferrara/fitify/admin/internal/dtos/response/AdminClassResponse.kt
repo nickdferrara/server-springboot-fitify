@@ -1,6 +1,5 @@
 package com.nickdferrara.fitify.admin.internal.dtos.response
 
-import com.nickdferrara.fitify.scheduling.ClassDetail
 import java.time.Instant
 import java.util.UUID
 
@@ -19,21 +18,4 @@ internal data class AdminClassResponse(
     val enrolledCount: Int,
     val waitlistSize: Int,
     val createdAt: Instant,
-)
-
-internal fun ClassDetail.toAdminResponse() = AdminClassResponse(
-    id = id,
-    name = name,
-    description = description,
-    classType = classType,
-    coachId = coachId,
-    room = room,
-    startTime = startTime,
-    endTime = endTime,
-    capacity = capacity,
-    locationId = locationId,
-    status = status,
-    enrolledCount = enrolledCount,
-    waitlistSize = waitlistSize,
-    createdAt = createdAt,
 )

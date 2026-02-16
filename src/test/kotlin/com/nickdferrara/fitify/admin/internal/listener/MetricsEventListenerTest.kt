@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.admin.internal.listener
 
-import com.nickdferrara.fitify.admin.internal.entities.MetricType
+import com.nickdferrara.fitify.admin.internal.entities.enums.MetricType
 import com.nickdferrara.fitify.admin.internal.entities.MetricsSnapshot
 import com.nickdferrara.fitify.admin.internal.repository.MetricsSnapshotRepository
 import com.nickdferrara.fitify.identity.UserRegisteredEvent

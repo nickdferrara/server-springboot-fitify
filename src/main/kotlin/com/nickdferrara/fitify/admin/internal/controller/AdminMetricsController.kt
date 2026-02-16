@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.admin.internal.controller
 
 import com.nickdferrara.fitify.admin.internal.dtos.response.MetricResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.OverviewResponse
-import com.nickdferrara.fitify.admin.internal.entities.Granularity
+import com.nickdferrara.fitify.admin.internal.entities.enums.Granularity
 import com.nickdferrara.fitify.admin.internal.service.MetricsService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
@@ -23,7 +23,7 @@ internal class AdminMetricsController(
 ) {
 
     @GetMapping("/signups")
-    fun getSignups(
+    fun findSignups(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate,
         @RequestParam(defaultValue = "DAILY") granularity: Granularity,
@@ -33,7 +33,7 @@ internal class AdminMetricsController(
     }
 
     @GetMapping("/cancellations")
-    fun getCancellations(
+    fun findCancellations(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate,
         @RequestParam(defaultValue = "DAILY") granularity: Granularity,
@@ -43,7 +43,7 @@ internal class AdminMetricsController(
     }
 
     @GetMapping("/revenue")
-    fun getRevenue(
+    fun findRevenue(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate,
         @RequestParam(defaultValue = "DAILY") granularity: Granularity,
@@ -53,7 +53,7 @@ internal class AdminMetricsController(
     }
 
     @GetMapping("/overview")
-    fun getOverview(
+    fun findOverview(
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate?,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate?,
         @RequestParam(required = false) locationId: UUID?,
@@ -72,7 +72,7 @@ internal class AdminLocationMetricsController(
 ) {
 
     @GetMapping("/overview")
-    fun getLocationOverview(
+    fun findLocationOverview(
         @PathVariable locationId: UUID,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate?,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate?,

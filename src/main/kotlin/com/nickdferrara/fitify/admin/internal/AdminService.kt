@@ -10,8 +10,8 @@ import com.nickdferrara.fitify.admin.internal.dtos.response.AdminClassResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.BusinessRuleResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.CancelClassResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.RecurringScheduleResponse
-import com.nickdferrara.fitify.admin.internal.dtos.response.toAdminResponse
-import com.nickdferrara.fitify.admin.internal.dtos.response.toResponse
+import com.nickdferrara.fitify.admin.internal.extensions.toAdminResponse
+import com.nickdferrara.fitify.admin.internal.extensions.toResponse
 import com.nickdferrara.fitify.admin.internal.entities.BusinessRule
 import com.nickdferrara.fitify.admin.internal.entities.RecurringSchedule
 import com.nickdferrara.fitify.admin.internal.exceptions.BusinessRuleNotFoundException
