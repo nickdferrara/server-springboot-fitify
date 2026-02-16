@@ -15,7 +15,7 @@ import com.nickdferrara.fitify.subscription.internal.dtos.response.BillingPortal
 import com.nickdferrara.fitify.subscription.internal.dtos.response.CheckoutResponse
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionPlanResponse
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionResponse
-import com.nickdferrara.fitify.subscription.internal.dtos.response.toResponse
+import com.nickdferrara.fitify.subscription.internal.extensions.toResponse
 import com.nickdferrara.fitify.subscription.internal.entities.PaymentHistory
 import com.nickdferrara.fitify.subscription.internal.entities.PlanType
 import com.nickdferrara.fitify.subscription.internal.entities.Subscription

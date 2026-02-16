@@ -1,10 +1,10 @@
-package com.nickdferrara.fitify.identity.internal
+package com.nickdferrara.fitify.identity.internal.service
 
 import com.nickdferrara.fitify.identity.IdentityApi
 import com.nickdferrara.fitify.identity.IdentityUserSummary
 import com.nickdferrara.fitify.identity.internal.dtos.request.UpdatePreferencesRequest
 import com.nickdferrara.fitify.identity.internal.dtos.response.UserPreferencesResponse
-import com.nickdferrara.fitify.identity.internal.dtos.response.toPreferencesResponse
+import com.nickdferrara.fitify.identity.internal.extensions.toPreferencesResponse
 import com.nickdferrara.fitify.identity.internal.entities.ThemePreference
 import com.nickdferrara.fitify.identity.internal.exception.UserNotFoundException
 import com.nickdferrara.fitify.identity.internal.repository.UserRepository

@@ -7,7 +7,7 @@ import com.nickdferrara.fitify.identity.internal.dtos.request.RegisterRequest
 import com.nickdferrara.fitify.identity.internal.dtos.request.ResetPasswordRequest
 import com.nickdferrara.fitify.identity.internal.dtos.response.MessageResponse
 import com.nickdferrara.fitify.identity.internal.dtos.response.RegisterResponse
-import com.nickdferrara.fitify.identity.internal.dtos.response.toRegisterResponse
+import com.nickdferrara.fitify.identity.internal.extensions.toRegisterResponse
 import com.nickdferrara.fitify.identity.internal.entities.PasswordResetToken
 import com.nickdferrara.fitify.identity.internal.entities.User
 import com.nickdferrara.fitify.identity.internal.exception.EmailAlreadyExistsException

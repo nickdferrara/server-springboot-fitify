@@ -3,7 +3,7 @@ package com.nickdferrara.fitify.notification.internal.controller
 import com.nickdferrara.fitify.notification.internal.dtos.request.RegisterDeviceTokenRequest
 import com.nickdferrara.fitify.notification.internal.dtos.response.DeviceTokenResponse
 import com.nickdferrara.fitify.notification.internal.dtos.response.NotificationLogResponse
-import com.nickdferrara.fitify.notification.internal.dtos.response.toResponse
+import com.nickdferrara.fitify.notification.internal.extensions.toResponse
 import com.nickdferrara.fitify.notification.internal.service.NotificationService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
