@@ -1,4 +1,4 @@
-package com.nickdferrara.fitify.admin.internal.entities
+package com.nickdferrara.fitify.admin.internal.entities.enums
 
 internal enum class Granularity {
     DAILY,

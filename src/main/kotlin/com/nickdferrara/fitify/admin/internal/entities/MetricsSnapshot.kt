@@ -10,6 +10,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
+import com.nickdferrara.fitify.admin.internal.entities.enums.MetricType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
