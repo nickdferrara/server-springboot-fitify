@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.identity.internal.controller
 
-import com.nickdferrara.fitify.identity.internal.IdentityService
+import com.nickdferrara.fitify.identity.internal.service.IdentityService
 import com.nickdferrara.fitify.identity.internal.dtos.request.UpdatePreferencesRequest
 import com.nickdferrara.fitify.identity.internal.dtos.response.UserPreferencesResponse
 import jakarta.validation.Valid

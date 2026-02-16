@@ -8,7 +8,7 @@ import com.nickdferrara.fitify.location.LocationUpdatedEvent
 import com.nickdferrara.fitify.location.internal.dtos.request.CreateLocationRequest
 import com.nickdferrara.fitify.location.internal.dtos.request.UpdateLocationRequest
 import com.nickdferrara.fitify.location.internal.dtos.response.LocationResponse
-import com.nickdferrara.fitify.location.internal.dtos.response.toResponse
+import com.nickdferrara.fitify.location.internal.extensions.toResponse
 import com.nickdferrara.fitify.location.internal.entities.Location
 import com.nickdferrara.fitify.location.internal.entities.LocationOperatingHours
 import com.nickdferrara.fitify.location.internal.repository.LocationRepository
