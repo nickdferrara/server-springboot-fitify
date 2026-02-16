@@ -1,6 +1,7 @@
-package com.nickdferrara.fitify.admin.internal
+package com.nickdferrara.fitify.admin.internal.service
 
 import com.nickdferrara.fitify.admin.AdminApi
+import com.nickdferrara.fitify.admin.internal.service.interfaces.AdminService
 import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateClassRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateRecurringScheduleRequest
@@ -36,16 +37,16 @@ import java.time.ZoneId
 import java.util.UUID
 
 @Service
-internal class AdminService(
+internal class AdminServiceImpl(
     private val schedulingApi: SchedulingApi,
     private val coachingApi: CoachingApi,
     private val locationApi: LocationApi,
     private val recurringScheduleRepository: RecurringScheduleRepository,
     private val businessRuleRepository: BusinessRuleRepository,
     private val eventPublisher: ApplicationEventPublisher,
-) : AdminApi {
+) : AdminService, AdminApi {
 
-    fun createClass(locationId: UUID, request: CreateClassRequest): AdminClassResponse {
+    override fun createClass(locationId: UUID, request: CreateClassRequest): AdminClassResponse {
         validateLocationExists(locationId)
         validateCoachExistsAndActive(request.coachId)
         checkCoachConflict(request.coachId, request.startTime, request.endTime, excludeClassId = null)
@@ -64,7 +65,7 @@ internal class AdminService(
         return schedulingApi.createClass(locationId, command).toAdminResponse()
     }
 
-    fun updateClass(classId: UUID, request: UpdateClassRequest): AdminClassResponse {
+    override fun updateClass(classId: UUID, request: UpdateClassRequest): AdminClassResponse {
         val existing = when (val result = schedulingApi.getClassDetail(classId)) {
             is Result.Success -> result.value
             is Result.Failure -> throw ClassNotFoundException(classId)
@@ -95,7 +96,7 @@ internal class AdminService(
         return schedulingApi.updateClass(classId, command).toAdminResponse()
     }
 
-    fun cancelClass(classId: UUID): CancelClassResponse {
+    override fun cancelClass(classId: UUID): CancelClassResponse {
         val result = schedulingApi.cancelClass(classId)
         return CancelClassResponse(
             classId = result.classId,
@@ -105,13 +106,13 @@ internal class AdminService(
         )
     }
 
-    fun listClassesByLocation(locationId: UUID): List<AdminClassResponse> {
+    override fun listClassesByLocation(locationId: UUID): List<AdminClassResponse> {
         validateLocationExists(locationId)
         return schedulingApi.findClassesByLocationId(locationId).map { it.toAdminResponse() }
     }
 
     @Transactional
-    fun createRecurringSchedule(
+    override fun createRecurringSchedule(
         locationId: UUID,
         request: CreateRecurringScheduleRequest,
     ): RecurringScheduleResponse {
@@ -207,12 +208,12 @@ internal class AdminService(
         return businessRuleRepository.findByRuleKeyAndLocationIdIsNull(ruleKey)?.value
     }
 
-    fun listBusinessRules(): List<BusinessRuleResponse> {
+    override fun listBusinessRules(): List<BusinessRuleResponse> {
         return businessRuleRepository.findAllByOrderByRuleKeyAscLocationIdAsc().map { it.toResponse() }
     }
 
     @Transactional
-    fun updateBusinessRule(ruleKey: String, request: UpdateBusinessRuleRequest, updatedBy: String): BusinessRuleResponse {
+    override fun updateBusinessRule(ruleKey: String, request: UpdateBusinessRuleRequest, updatedBy: String): BusinessRuleResponse {
         val existing = if (request.locationId != null) {
             businessRuleRepository.findByRuleKeyAndLocationId(ruleKey, request.locationId)
         } else {

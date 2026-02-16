@@ -14,7 +14,7 @@ import com.nickdferrara.fitify.identity.internal.exception.WeakPasswordException
 import com.nickdferrara.fitify.identity.internal.gateway.IdentityProviderGateway
 import com.nickdferrara.fitify.identity.internal.repository.PasswordResetTokenRepository
 import com.nickdferrara.fitify.identity.internal.repository.UserRepository
-import com.nickdferrara.fitify.identity.internal.service.AuthService
+import com.nickdferrara.fitify.identity.internal.service.AuthServiceImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -37,7 +37,7 @@ class AuthServiceTest {
     private val identityProvider = mockk<IdentityProviderGateway>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
     private val tokenPepper = "test-pepper"
-    private val authService = AuthService(userRepository, passwordResetTokenRepository, identityProvider, eventPublisher, tokenPepper)
+    private val authService = AuthServiceImpl(userRepository, passwordResetTokenRepository, identityProvider, eventPublisher, tokenPepper)
 
     private fun buildUser(
         id: UUID = UUID.randomUUID(),

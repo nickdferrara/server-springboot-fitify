@@ -53,16 +53,16 @@ import java.time.ZoneOffset
 import java.util.UUID
 
 @Service
-internal class SchedulingService(
+internal class SchedulingServiceImpl(
     private val fitnessClassRepository: FitnessClassRepository,
     private val bookingRepository: BookingRepository,
     private val waitlistEntryRepository: WaitlistEntryRepository,
     private val eventPublisher: ApplicationEventPublisher,
-) : SchedulingApi {
+) : com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService, SchedulingApi {
 
-    var cancellationWindowHours: Long = 24
-    var maxWaitlistSize: Int = 20
-    var maxBookingsPerDay: Int = 3
+    override var cancellationWindowHours: Long = 24
+    override var maxWaitlistSize: Int = 20
+    override var maxBookingsPerDay: Int = 3
 
     // --- Public API (cross-module) ---
 
@@ -227,7 +227,7 @@ internal class SchedulingService(
 
     // --- Search ---
 
-    fun searchClasses(
+    override fun searchClasses(
         date: LocalDate?,
         classType: String?,
         coachId: UUID?,
@@ -250,7 +250,7 @@ internal class SchedulingService(
     // --- Internal CRUD (used by internal controllers) ---
 
     @Transactional
-    fun createClass(locationId: UUID, request: CreateClassRequest): ClassResponse {
+    override fun createClass(locationId: UUID, request: CreateClassRequest): ClassResponse {
         val fitnessClass = FitnessClass(
             locationId = locationId,
             name = request.name,
@@ -265,14 +265,14 @@ internal class SchedulingService(
         return fitnessClassRepository.save(fitnessClass).toResponse()
     }
 
-    fun getClass(classId: UUID): ClassResponse {
+    override fun getClass(classId: UUID): ClassResponse {
         val fitnessClass = fitnessClassRepository.findById(classId)
             .orElseThrow { FitnessClassNotFoundException(classId) }
         return fitnessClass.toResponse()
     }
 
     @Transactional
-    fun updateClass(classId: UUID, request: UpdateClassRequest): ClassResponse {
+    override fun updateClass(classId: UUID, request: UpdateClassRequest): ClassResponse {
         val fitnessClass = fitnessClassRepository.findById(classId)
             .orElseThrow { FitnessClassNotFoundException(classId) }
 
@@ -289,7 +289,7 @@ internal class SchedulingService(
     }
 
     @Transactional
-    fun cancelClassInternal(classId: UUID) {
+    override fun cancelClassInternal(classId: UUID) {
         val fitnessClass = fitnessClassRepository.findById(classId)
             .orElseThrow { FitnessClassNotFoundException(classId) }
 
@@ -313,7 +313,7 @@ internal class SchedulingService(
     // --- Booking ---
 
     @Transactional
-    fun bookClass(classId: UUID, userId: UUID): BookClassResult {
+    override fun bookClass(classId: UUID, userId: UUID): BookClassResult {
         val fitnessClass = fitnessClassRepository.findById(classId)
             .orElseThrow { FitnessClassNotFoundException(classId) }
 
@@ -399,7 +399,7 @@ internal class SchedulingService(
     }
 
     @Transactional
-    fun cancelBooking(classId: UUID, userId: UUID) {
+    override fun cancelBooking(classId: UUID, userId: UUID) {
         val booking = bookingRepository
             .findByFitnessClassIdAndUserIdAndStatus(classId, userId, BookingStatus.CONFIRMED)
             ?: throw BookingNotFoundException(classId, userId)
@@ -428,13 +428,13 @@ internal class SchedulingService(
 
     // --- Waitlist ---
 
-    fun getUserWaitlistEntries(userId: UUID): List<WaitlistEntryResponse> {
+    override fun getUserWaitlistEntries(userId: UUID): List<WaitlistEntryResponse> {
         return waitlistEntryRepository.findByUserIdOrderByCreatedAtDesc(userId)
             .map { it.toResponse() }
     }
 
     @Transactional
-    fun removeFromWaitlist(classId: UUID, userId: UUID) {
+    override fun removeFromWaitlist(classId: UUID, userId: UUID) {
         val entry = waitlistEntryRepository.findByFitnessClassIdAndUserId(classId, userId)
             ?: throw WaitlistEntryNotFoundException(classId, userId)
         waitlistEntryRepository.delete(entry)

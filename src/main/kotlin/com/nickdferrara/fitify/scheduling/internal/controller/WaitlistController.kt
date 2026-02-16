@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.scheduling.internal.controller
 
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.WaitlistEntryResponse
-import com.nickdferrara.fitify.scheduling.internal.service.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt

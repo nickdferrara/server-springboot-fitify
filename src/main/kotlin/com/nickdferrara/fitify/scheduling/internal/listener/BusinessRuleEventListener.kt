@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.scheduling.internal.listener
 
-import com.nickdferrara.fitify.scheduling.internal.service.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService
 import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener

@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.coaching.internal.controller
 
 import com.nickdferrara.fitify.coaching.internal.dtos.response.CoachResponse
-import com.nickdferrara.fitify.coaching.internal.service.CoachingService
+import com.nickdferrara.fitify.coaching.internal.service.interfaces.CoachingService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping

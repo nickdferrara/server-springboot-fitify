@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.admin.internal.controller
 
-import com.nickdferrara.fitify.admin.internal.AdminService
+import com.nickdferrara.fitify.admin.internal.service.interfaces.AdminService
 import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateBusinessRuleRequest
 import com.nickdferrara.fitify.admin.internal.dtos.response.BusinessRuleResponse
 import jakarta.validation.Valid

@@ -10,6 +10,7 @@ import com.nickdferrara.fitify.admin.internal.entities.enums.MetricType
 import com.nickdferrara.fitify.admin.internal.entities.MetricsSnapshot
 import com.nickdferrara.fitify.admin.internal.exceptions.InvalidMetricsQueryException
 import com.nickdferrara.fitify.admin.internal.repository.MetricsSnapshotRepository
+import com.nickdferrara.fitify.admin.internal.service.interfaces.MetricsService
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -19,26 +20,26 @@ import java.time.temporal.IsoFields
 import java.util.UUID
 
 @Service
-internal class MetricsService(
+internal class MetricsServiceImpl(
     private val metricsSnapshotRepository: MetricsSnapshotRepository,
-) {
+) : MetricsService {
 
-    fun getSignups(from: LocalDate, to: LocalDate, granularity: Granularity, locationId: UUID?): MetricResponse {
+    override fun getSignups(from: LocalDate, to: LocalDate, granularity: Granularity, locationId: UUID?): MetricResponse {
         validateDateRange(from, to)
         return getMetric(MetricType.SIGNUPS, from, to, granularity, locationId)
     }
 
-    fun getCancellations(from: LocalDate, to: LocalDate, granularity: Granularity, locationId: UUID?): MetricResponse {
+    override fun getCancellations(from: LocalDate, to: LocalDate, granularity: Granularity, locationId: UUID?): MetricResponse {
         validateDateRange(from, to)
         return getMetric(MetricType.CANCELLATIONS, from, to, granularity, locationId)
     }
 
-    fun getRevenue(from: LocalDate, to: LocalDate, granularity: Granularity, locationId: UUID?): MetricResponse {
+    override fun getRevenue(from: LocalDate, to: LocalDate, granularity: Granularity, locationId: UUID?): MetricResponse {
         validateDateRange(from, to)
         return getMetric(MetricType.REVENUE, from, to, granularity, locationId)
     }
 
-    fun getOverview(from: LocalDate, to: LocalDate, locationId: UUID?): OverviewResponse {
+    override fun getOverview(from: LocalDate, to: LocalDate, locationId: UUID?): OverviewResponse {
         validateDateRange(from, to)
         val metricTypes = listOf(
             MetricType.SIGNUPS,

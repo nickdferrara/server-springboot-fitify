@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.scheduling.internal.controller
 
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.ClassResponse
 import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
-import com.nickdferrara.fitify.scheduling.internal.service.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus

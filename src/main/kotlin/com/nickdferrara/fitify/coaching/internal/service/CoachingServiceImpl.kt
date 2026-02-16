@@ -24,10 +24,10 @@ import java.time.Instant
 import java.util.UUID
 
 @Service
-internal class CoachingService(
+internal class CoachingServiceImpl(
     private val coachRepository: CoachRepository,
     private val eventPublisher: ApplicationEventPublisher,
-) : CoachingApi {
+) : com.nickdferrara.fitify.coaching.internal.service.interfaces.CoachingService, CoachingApi {
 
     override fun findCoachById(id: UUID): Result<CoachSummary, DomainError> {
         val coach = coachRepository.findById(id).orElse(null)
@@ -43,18 +43,18 @@ internal class CoachingService(
         return coachRepository.findActiveCoachesByLocationId(locationId).map { it.toSummary() }
     }
 
-    fun findAll(): List<CoachResponse> {
+    override fun findAll(): List<CoachResponse> {
         return coachRepository.findAll().map { it.toResponse() }
     }
 
-    fun findById(id: UUID): CoachResponse {
+    override fun findById(id: UUID): CoachResponse {
         val coach = coachRepository.findById(id)
             .orElseThrow { CoachNotFoundException(id) }
         return coach.toResponse()
     }
 
     @Transactional
-    fun createCoach(request: CreateCoachRequest): CoachResponse {
+    override fun createCoach(request: CreateCoachRequest): CoachResponse {
         val coach = Coach(
             name = request.name,
             bio = request.bio,
@@ -86,7 +86,7 @@ internal class CoachingService(
     }
 
     @Transactional
-    fun updateCoach(id: UUID, request: UpdateCoachRequest): CoachResponse {
+    override fun updateCoach(id: UUID, request: UpdateCoachRequest): CoachResponse {
         val coach = coachRepository.findById(id)
             .orElseThrow { CoachNotFoundException(id) }
 
@@ -127,7 +127,7 @@ internal class CoachingService(
     }
 
     @Transactional
-    fun deactivateCoach(id: UUID) {
+    override fun deactivateCoach(id: UUID) {
         val coach = coachRepository.findById(id)
             .orElseThrow { CoachNotFoundException(id) }
 
@@ -143,7 +143,7 @@ internal class CoachingService(
     }
 
     @Transactional
-    fun assignLocations(coachId: UUID, request: AssignCoachLocationsRequest): CoachResponse {
+    override fun assignLocations(coachId: UUID, request: AssignCoachLocationsRequest): CoachResponse {
         val coach = coachRepository.findById(coachId)
             .orElseThrow { CoachNotFoundException(coachId) }
 
@@ -161,7 +161,7 @@ internal class CoachingService(
         return saved.toResponse()
     }
 
-    fun findCoachesByLocationId(locationId: UUID): List<CoachResponse> {
+    override fun findCoachesByLocationId(locationId: UUID): List<CoachResponse> {
         return coachRepository.findActiveCoachesByLocationId(locationId).map { it.toResponse() }
     }
 

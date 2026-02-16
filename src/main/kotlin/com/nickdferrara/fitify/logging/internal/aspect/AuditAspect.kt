@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.logging.internal.aspect
 
 import com.nickdferrara.fitify.logging.Audit
 import com.nickdferrara.fitify.logging.internal.config.LoggingProperties
-import com.nickdferrara.fitify.logging.internal.service.AuditLogService
+import com.nickdferrara.fitify.logging.internal.service.interfaces.AuditLogService
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect

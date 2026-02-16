@@ -3,7 +3,7 @@ package com.nickdferrara.fitify.logging.internal
 import com.nickdferrara.fitify.logging.Audit
 import com.nickdferrara.fitify.logging.internal.aspect.AuditAspect
 import com.nickdferrara.fitify.logging.internal.config.LoggingProperties
-import com.nickdferrara.fitify.logging.internal.service.AuditLogService
+import com.nickdferrara.fitify.logging.internal.service.interfaces.AuditLogService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

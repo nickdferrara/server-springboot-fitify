@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.security.internal.controller
 
 import com.nickdferrara.fitify.security.internal.dtos.request.AssignLocationAdminRequest
 import com.nickdferrara.fitify.security.internal.dtos.response.LocationAdminAssignmentResponse
-import com.nickdferrara.fitify.security.internal.service.LocationAdminService
+import com.nickdferrara.fitify.security.internal.service.interfaces.LocationAdminService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

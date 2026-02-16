@@ -10,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
 @Service
-internal class AuditLogService(
+internal class AuditLogServiceImpl(
     private val auditLogRepository: AuditLogRepository,
-) : LoggingApi {
+) : com.nickdferrara.fitify.logging.internal.service.interfaces.AuditLogService, LoggingApi {
 
     @Transactional
-    fun save(
+    override fun save(
         userId: String,
         action: String,
         module: String,

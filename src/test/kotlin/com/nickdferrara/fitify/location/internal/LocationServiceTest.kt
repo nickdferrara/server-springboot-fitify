@@ -10,7 +10,7 @@ import com.nickdferrara.fitify.location.internal.entities.Location
 import com.nickdferrara.fitify.location.internal.entities.LocationOperatingHours
 import com.nickdferrara.fitify.location.internal.repository.LocationRepository
 import com.nickdferrara.fitify.location.internal.service.LocationNotFoundException
-import com.nickdferrara.fitify.location.internal.service.LocationService
+import com.nickdferrara.fitify.location.internal.service.LocationServiceImpl
 import com.nickdferrara.fitify.shared.NotFoundError
 import com.nickdferrara.fitify.shared.Result
 import io.mockk.every
@@ -34,7 +34,7 @@ class LocationServiceTest {
 
     private val locationRepository = mockk<LocationRepository>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
-    private val locationService = LocationService(locationRepository, eventPublisher)
+    private val locationService = LocationServiceImpl(locationRepository, eventPublisher)
 
     private fun buildLocation(
         id: UUID = UUID.randomUUID(),

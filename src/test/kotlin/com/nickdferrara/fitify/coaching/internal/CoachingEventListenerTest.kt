@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.coaching.internal
 
 import com.nickdferrara.fitify.coaching.internal.listener.CoachingEventListener
-import com.nickdferrara.fitify.coaching.internal.service.CoachingService
+import com.nickdferrara.fitify.coaching.internal.service.interfaces.CoachingService
 import com.nickdferrara.fitify.location.LocationCreatedEvent
 import com.nickdferrara.fitify.location.LocationDeactivatedEvent
 import com.nickdferrara.fitify.location.LocationUpdatedEvent

@@ -3,7 +3,7 @@ package com.nickdferrara.fitify.admin.internal.controller
 import com.nickdferrara.fitify.admin.internal.dtos.response.MetricResponse
 import com.nickdferrara.fitify.admin.internal.dtos.response.OverviewResponse
 import com.nickdferrara.fitify.admin.internal.entities.enums.Granularity
-import com.nickdferrara.fitify.admin.internal.service.MetricsService
+import com.nickdferrara.fitify.admin.internal.service.interfaces.MetricsService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

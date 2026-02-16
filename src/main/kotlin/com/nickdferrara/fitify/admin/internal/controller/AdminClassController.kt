@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.admin.internal.controller
 
-import com.nickdferrara.fitify.admin.internal.AdminService
+import com.nickdferrara.fitify.admin.internal.service.interfaces.AdminService
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateClassRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateRecurringScheduleRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.UpdateClassRequest

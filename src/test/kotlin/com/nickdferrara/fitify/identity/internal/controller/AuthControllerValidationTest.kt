@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.identity.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
-import com.nickdferrara.fitify.identity.internal.service.AuthService
+import com.nickdferrara.fitify.identity.internal.service.interfaces.AuthService
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

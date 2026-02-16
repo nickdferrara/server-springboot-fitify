@@ -45,7 +45,7 @@ import java.util.UUID
 
 @Service
 @EnableConfigurationProperties(StripeProperties::class)
-internal class SubscriptionService(
+internal class SubscriptionServiceImpl(
     private val subscriptionRepository: SubscriptionRepository,
     private val subscriptionPlanRepository: SubscriptionPlanRepository,
     private val paymentHistoryRepository: PaymentHistoryRepository,
@@ -54,7 +54,7 @@ internal class SubscriptionService(
     private val annualLifecycle: AnnualSubscriptionLifecycle,
     private val stripeProperties: StripeProperties,
     private val eventPublisher: ApplicationEventPublisher,
-) : SubscriptionApi {
+) : com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService, SubscriptionApi {
 
     @PostConstruct
     fun init() {
@@ -102,11 +102,11 @@ internal class SubscriptionService(
 
     // --- User-facing methods ---
 
-    fun getAvailablePlans(): List<SubscriptionPlanResponse> {
+    override fun getAvailablePlans(): List<SubscriptionPlanResponse> {
         return subscriptionPlanRepository.findByActiveTrue().map { it.toResponse() }
     }
 
-    fun getCurrentSubscription(userId: UUID): SubscriptionResponse {
+    override fun getCurrentSubscription(userId: UUID): SubscriptionResponse {
         val subscription = subscriptionRepository.findByUserIdAndStatusIn(
             userId, listOf(SubscriptionStatus.ACTIVE, SubscriptionStatus.CANCELLING)
         ) ?: throw SubscriptionNotFoundException("No active subscription found for user: $userId")
@@ -114,7 +114,7 @@ internal class SubscriptionService(
     }
 
     @Transactional
-    fun createCheckoutSession(userId: UUID, request: CheckoutRequest): CheckoutResponse {
+    override fun createCheckoutSession(userId: UUID, request: CheckoutRequest): CheckoutResponse {
         if (hasActiveSubscription(userId)) {
             throw ActiveSubscriptionExistsException("User already has an active subscription")
         }
@@ -148,7 +148,7 @@ internal class SubscriptionService(
     }
 
     @Transactional
-    fun cancelSubscription(userId: UUID): SubscriptionResponse {
+    override fun cancelSubscription(userId: UUID): SubscriptionResponse {
         val subscription = subscriptionRepository.findByUserIdAndStatusIn(
             userId, listOf(SubscriptionStatus.ACTIVE)
         ) ?: throw SubscriptionNotFoundException("No active subscription found for user: $userId")
@@ -182,7 +182,7 @@ internal class SubscriptionService(
     }
 
     @Transactional
-    fun changePlan(userId: UUID, request: ChangePlanRequest): CheckoutResponse {
+    override fun changePlan(userId: UUID, request: ChangePlanRequest): CheckoutResponse {
         val currentSubscription = subscriptionRepository.findByUserIdAndStatusIn(
             userId, listOf(SubscriptionStatus.ACTIVE, SubscriptionStatus.CANCELLING)
         )
@@ -201,7 +201,7 @@ internal class SubscriptionService(
         return createCheckoutSession(userId, CheckoutRequest(planId = request.newPlanId))
     }
 
-    fun createBillingPortalSession(userId: UUID): BillingPortalResponse {
+    override fun createBillingPortalSession(userId: UUID): BillingPortalResponse {
         val subscription = subscriptionRepository.findByUserIdAndStatusIn(
             userId, listOf(SubscriptionStatus.ACTIVE, SubscriptionStatus.CANCELLING)
         ) ?: throw SubscriptionNotFoundException("No active subscription found for user: $userId")
@@ -226,7 +226,7 @@ internal class SubscriptionService(
     // --- Webhook handlers ---
 
     @Transactional
-    fun handleSubscriptionCreated(stripeSubscriptionId: String, customerId: String, metadata: Map<String, String>) {
+    override fun handleSubscriptionCreated(stripeSubscriptionId: String, customerId: String, metadata: Map<String, String>) {
         val userId = UUID.fromString(metadata["userId"])
         val planType = PlanType.valueOf(metadata["planType"] ?: "MONTHLY")
 
@@ -263,7 +263,7 @@ internal class SubscriptionService(
     }
 
     @Transactional
-    fun handleSubscriptionRenewed(stripeSubscriptionId: String, amountPaid: Long, paymentIntentId: String?) {
+    override fun handleSubscriptionRenewed(stripeSubscriptionId: String, amountPaid: Long, paymentIntentId: String?) {
         val subscription = subscriptionRepository.findByStripeSubscriptionId(stripeSubscriptionId)
             ?: return
 
@@ -301,7 +301,7 @@ internal class SubscriptionService(
     }
 
     @Transactional
-    fun handleSubscriptionExpired(stripeSubscriptionId: String) {
+    override fun handleSubscriptionExpired(stripeSubscriptionId: String) {
         val subscription = subscriptionRepository.findByStripeSubscriptionId(stripeSubscriptionId)
             ?: return
 
@@ -318,7 +318,7 @@ internal class SubscriptionService(
     }
 
     @Transactional
-    fun handlePaymentFailed(stripeSubscriptionId: String, paymentIntentId: String?) {
+    override fun handlePaymentFailed(stripeSubscriptionId: String, paymentIntentId: String?) {
         val subscription = subscriptionRepository.findByStripeSubscriptionId(stripeSubscriptionId)
             ?: return
 

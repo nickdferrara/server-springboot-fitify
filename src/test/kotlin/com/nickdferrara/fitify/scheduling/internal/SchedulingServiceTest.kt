@@ -22,7 +22,7 @@ import com.nickdferrara.fitify.scheduling.internal.exceptions.DailyBookingLimitE
 import com.nickdferrara.fitify.scheduling.internal.exceptions.FitnessClassNotFoundException
 import com.nickdferrara.fitify.scheduling.internal.exceptions.ScheduleConflictException
 import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
-import com.nickdferrara.fitify.scheduling.internal.service.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.SchedulingServiceImpl
 import com.nickdferrara.fitify.scheduling.internal.exceptions.WaitlistEntryNotFoundException
 import com.nickdferrara.fitify.scheduling.internal.exceptions.WaitlistFullException
 import com.nickdferrara.fitify.shared.NotFoundError
@@ -47,7 +47,7 @@ class SchedulingServiceTest {
     private val bookingRepository = mockk<BookingRepository>()
     private val waitlistEntryRepository = mockk<WaitlistEntryRepository>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
-    private val service = SchedulingService(
+    private val service = SchedulingServiceImpl(
         fitnessClassRepository, bookingRepository, waitlistEntryRepository, eventPublisher,
     )
 

@@ -1,5 +1,6 @@
 package com.nickdferrara.fitify.identity.internal
 
+import com.nickdferrara.fitify.identity.internal.service.IdentityServiceImpl
 import com.nickdferrara.fitify.identity.internal.dtos.request.UpdatePreferencesRequest
 import com.nickdferrara.fitify.identity.internal.entities.ThemePreference
 import com.nickdferrara.fitify.identity.internal.entities.User
@@ -19,7 +20,7 @@ import java.util.UUID
 class IdentityServiceTest {
 
     private val userRepository = mockk<UserRepository>()
-    private val identityService = IdentityService(userRepository)
+    private val identityService = IdentityServiceImpl(userRepository)
 
     private fun buildUser(
         id: UUID = UUID.randomUUID(),

@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.logging.internal
 
 import com.nickdferrara.fitify.logging.internal.entities.AuditLogEntity
 import com.nickdferrara.fitify.logging.internal.repository.AuditLogRepository
-import com.nickdferrara.fitify.logging.internal.service.AuditLogService
+import com.nickdferrara.fitify.logging.internal.service.AuditLogServiceImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -17,7 +17,7 @@ import java.util.UUID
 class AuditLogServiceTest {
 
     private val auditLogRepository = mockk<AuditLogRepository>(relaxed = true)
-    private val auditLogService = AuditLogService(auditLogRepository)
+    private val auditLogService = AuditLogServiceImpl(auditLogRepository)
 
     @Test
     fun `save persists audit log entity`() {
