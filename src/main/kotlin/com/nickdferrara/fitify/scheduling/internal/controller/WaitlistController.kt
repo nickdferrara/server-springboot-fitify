@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.scheduling.internal.controller
 
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.WaitlistEntryResponse
-import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingCommandService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -13,7 +13,7 @@ import java.util.UUID
 
 @RestController
 internal class WaitlistController(
-    private val schedulingService: SchedulingService,
+    private val schedulingCommandService: SchedulingCommandService,
 ) {
 
     @GetMapping("/api/v1/users/me/waitlist")
@@ -21,7 +21,7 @@ internal class WaitlistController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<List<WaitlistEntryResponse>> {
         val userId = UUID.fromString(jwt.subject)
-        return ResponseEntity.ok(schedulingService.getUserWaitlistEntries(userId))
+        return ResponseEntity.ok(schedulingCommandService.getUserWaitlistEntries(userId))
     }
 
     @DeleteMapping("/api/v1/classes/{classId}/waitlist")
@@ -30,7 +30,7 @@ internal class WaitlistController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Void> {
         val userId = UUID.fromString(jwt.subject)
-        schedulingService.removeFromWaitlist(classId, userId)
+        schedulingCommandService.removeFromWaitlist(classId, userId)
         return ResponseEntity.noContent().build()
     }
 }

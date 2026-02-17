@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.scheduling.internal.controller
 
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.ClassResponse
 import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
-import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingCommandService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -22,7 +22,7 @@ import java.util.UUID
 @RestController
 @RequestMapping("/api/v1/classes")
 internal class ClassController(
-    private val schedulingService: SchedulingService,
+    private val schedulingCommandService: SchedulingCommandService,
 ) {
 
     @GetMapping
@@ -35,7 +35,7 @@ internal class ClassController(
         pageable: Pageable,
     ): ResponseEntity<Page<ClassResponse>> {
         return ResponseEntity.ok(
-            schedulingService.searchClasses(date, classType, coachId, locationId, available, pageable)
+            schedulingCommandService.searchClasses(date, classType, coachId, locationId, available, pageable)
         )
     }
 
@@ -45,7 +45,7 @@ internal class ClassController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> {
         val userId = UUID.fromString(jwt.subject)
-        return when (val result = schedulingService.bookClass(classId, userId)) {
+        return when (val result = schedulingCommandService.bookClass(classId, userId)) {
             is BookClassResult.Booked -> ResponseEntity.status(HttpStatus.CREATED).body(result.booking)
             is BookClassResult.Waitlisted -> ResponseEntity.status(HttpStatus.ACCEPTED).body(result.waitlistEntry)
         }
@@ -57,7 +57,7 @@ internal class ClassController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Void> {
         val userId = UUID.fromString(jwt.subject)
-        schedulingService.cancelBooking(classId, userId)
+        schedulingCommandService.cancelBooking(classId, userId)
         return ResponseEntity.noContent().build()
     }
 }
