@@ -1,6 +1,6 @@
 package com.nickdferrara.fitify.scheduling.internal.listener
 
-import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingCommandService
 import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import io.mockk.mockk
 import io.mockk.verify
@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test
 
 class BusinessRuleEventListenerTest {
 
-    private val schedulingService = mockk<SchedulingService>(relaxed = true)
-    private val listener = BusinessRuleEventListener(schedulingService)
+    private val schedulingCommandService = mockk<SchedulingCommandService>(relaxed = true)
+    private val listener = BusinessRuleEventListener(schedulingCommandService)
 
     @Test
     fun `onBusinessRuleUpdated updates cancellation window hours`() {
@@ -22,7 +22,7 @@ class BusinessRuleEventListenerTest {
 
         listener.onBusinessRuleUpdated(event)
 
-        verify { schedulingService.cancellationWindowHours = 48L }
+        verify { schedulingCommandService.cancellationWindowHours = 48L }
     }
 
     @Test
@@ -36,7 +36,7 @@ class BusinessRuleEventListenerTest {
 
         listener.onBusinessRuleUpdated(event)
 
-        verify { schedulingService.maxWaitlistSize = 30 }
+        verify { schedulingCommandService.maxWaitlistSize = 30 }
     }
 
     @Test
@@ -50,6 +50,6 @@ class BusinessRuleEventListenerTest {
 
         listener.onBusinessRuleUpdated(event)
 
-        verify { schedulingService.maxBookingsPerDay = 5 }
+        verify { schedulingCommandService.maxBookingsPerDay = 5 }
     }
 }

@@ -3,7 +3,7 @@ package com.nickdferrara.fitify.scheduling.internal.controller
 import com.nickdferrara.fitify.TestSecurityConfig
 import com.nickdferrara.fitify.scheduling.internal.dtos.response.ClassResponse
 import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
-import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingService
+import com.nickdferrara.fitify.scheduling.internal.service.interfaces.SchedulingCommandService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
@@ -45,7 +45,7 @@ internal class ClassControllerWebMvcTest {
     lateinit var mockMvc: MockMvc
 
     @MockkBean
-    lateinit var schedulingService: SchedulingService
+    lateinit var schedulingCommandService: SchedulingCommandService
 
     private val classId = UUID.randomUUID()
     private val userId = UUID.randomUUID()
@@ -70,7 +70,7 @@ internal class ClassControllerWebMvcTest {
     @Test
     fun `GET classes returns paginated results`() {
         val response = buildClassResponse()
-        every { schedulingService.searchClasses(any(), any(), any(), any(), any(), any()) } returns
+        every { schedulingCommandService.searchClasses(any(), any(), any(), any(), any(), any()) } returns
             PageImpl(listOf(response))
 
         mockMvc.perform(
@@ -93,7 +93,7 @@ internal class ClassControllerWebMvcTest {
             status = "CONFIRMED",
             bookedAt = Instant.now(),
         )
-        every { schedulingService.bookClass(classId, any()) } returns BookClassResult.Booked(bookingResponse)
+        every { schedulingCommandService.bookClass(classId, any()) } returns BookClassResult.Booked(bookingResponse)
 
         mockMvc.perform(
             post("/api/v1/classes/$classId/book")
@@ -104,7 +104,7 @@ internal class ClassControllerWebMvcTest {
 
     @Test
     fun `DELETE booking returns NO_CONTENT`() {
-        every { schedulingService.cancelBooking(classId, any()) } returns Unit
+        every { schedulingCommandService.cancelBooking(classId, any()) } returns Unit
 
         mockMvc.perform(
             delete("/api/v1/classes/$classId/booking")
@@ -112,6 +112,6 @@ internal class ClassControllerWebMvcTest {
         )
             .andExpect(status().isNoContent)
 
-        verify { schedulingService.cancelBooking(classId, any()) }
+        verify { schedulingCommandService.cancelBooking(classId, any()) }
     }
 }

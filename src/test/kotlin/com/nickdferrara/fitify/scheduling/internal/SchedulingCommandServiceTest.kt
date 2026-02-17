@@ -21,12 +21,10 @@ import com.nickdferrara.fitify.scheduling.internal.exceptions.ClassNotBookableEx
 import com.nickdferrara.fitify.scheduling.internal.exceptions.DailyBookingLimitExceededException
 import com.nickdferrara.fitify.scheduling.internal.exceptions.FitnessClassNotFoundException
 import com.nickdferrara.fitify.scheduling.internal.exceptions.ScheduleConflictException
-import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
-import com.nickdferrara.fitify.scheduling.internal.service.SchedulingServiceImpl
 import com.nickdferrara.fitify.scheduling.internal.exceptions.WaitlistEntryNotFoundException
 import com.nickdferrara.fitify.scheduling.internal.exceptions.WaitlistFullException
-import com.nickdferrara.fitify.shared.NotFoundError
-import com.nickdferrara.fitify.shared.Result
+import com.nickdferrara.fitify.scheduling.internal.model.BookClassResult
+import com.nickdferrara.fitify.scheduling.internal.service.SchedulingCommandServiceImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -41,13 +39,13 @@ import java.time.temporal.ChronoUnit
 import java.util.Optional
 import java.util.UUID
 
-class SchedulingServiceTest {
+class SchedulingCommandServiceTest {
 
     private val fitnessClassRepository = mockk<FitnessClassRepository>()
     private val bookingRepository = mockk<BookingRepository>()
     private val waitlistEntryRepository = mockk<WaitlistEntryRepository>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
-    private val service = SchedulingServiceImpl(
+    private val service = SchedulingCommandServiceImpl(
         fitnessClassRepository, bookingRepository, waitlistEntryRepository, eventPublisher,
     )
 
@@ -90,48 +88,7 @@ class SchedulingServiceTest {
         bookedAt = Instant.now(),
     )
 
-    // --- Public API Tests ---
-
-    @Test
-    fun `findClassById returns summary when class exists`() {
-        val id = UUID.randomUUID()
-        val fc = buildFitnessClass(id = id)
-        every { fitnessClassRepository.findById(id) } returns Optional.of(fc)
-
-        val result = service.findClassById(id)
-
-        assertTrue(result is Result.Success)
-        val summary = (result as Result.Success).value
-        assertEquals(id, summary.id)
-        assertEquals("Morning Yoga", summary.name)
-    }
-
-    @Test
-    fun `findClassById returns failure when class does not exist`() {
-        val id = UUID.randomUUID()
-        every { fitnessClassRepository.findById(id) } returns Optional.empty()
-
-        val result = service.findClassById(id)
-
-        assertTrue(result is Result.Failure)
-        val error = (result as Result.Failure).error
-        assertTrue(error is NotFoundError)
-    }
-
-    @Test
-    fun `findUpcomingClassesByLocationId delegates to repository`() {
-        val fc = buildFitnessClass()
-        every {
-            fitnessClassRepository.findByLocationIdAndStartTimeAfterOrderByStartTimeAsc(locationId, any())
-        } returns listOf(fc)
-
-        val results = service.findUpcomingClassesByLocationId(locationId)
-
-        assertEquals(1, results.size)
-        assertEquals("Morning Yoga", results[0].name)
-    }
-
-    // --- Admin CRUD Tests ---
+    // --- Internal CRUD Tests ---
 
     @Test
     fun `createClass persists and returns response`() {
@@ -197,7 +154,7 @@ class SchedulingServiceTest {
     }
 
     @Test
-    fun `cancelClass sets status and cancels all bookings`() {
+    fun `cancelClassInternal sets status and cancels all bookings`() {
         val classId = UUID.randomUUID()
         val fc = buildFitnessClass(id = classId)
         val booking = buildBooking(fitnessClass = fc)
@@ -209,7 +166,7 @@ class SchedulingServiceTest {
         every { waitlistEntryRepository.deleteAll(any<List<WaitlistEntry>>()) } returns Unit
         every { fitnessClassRepository.save(any()) } answers { firstArg() }
 
-        service.cancelClass(classId)
+        service.cancelClassInternal(classId)
 
         assertEquals(FitnessClassStatus.CANCELLED, fc.status)
         assertEquals(BookingStatus.CANCELLED, booking.status)

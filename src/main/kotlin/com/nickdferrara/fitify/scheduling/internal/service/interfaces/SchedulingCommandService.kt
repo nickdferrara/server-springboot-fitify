@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable
 import java.time.LocalDate
 import java.util.UUID
 
-internal interface SchedulingService {
+internal interface SchedulingCommandService {
     var cancellationWindowHours: Long
     var maxWaitlistSize: Int
     var maxBookingsPerDay: Int
