@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.location.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
-import com.nickdferrara.fitify.location.internal.service.LocationService
+import com.nickdferrara.fitify.location.internal.service.interfaces.LocationService
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

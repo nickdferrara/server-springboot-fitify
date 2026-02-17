@@ -20,7 +20,7 @@ import java.util.UUID
 class MetricsServiceTest {
 
     private val repository = mockk<MetricsSnapshotRepository>()
-    private val service = MetricsService(repository)
+    private val service = MetricsServiceImpl(repository)
 
     private fun buildSnapshot(
         metricType: MetricType = MetricType.SIGNUPS,

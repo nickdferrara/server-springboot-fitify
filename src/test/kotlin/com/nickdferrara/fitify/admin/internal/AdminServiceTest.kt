@@ -1,5 +1,6 @@
 package com.nickdferrara.fitify.admin.internal
 
+import com.nickdferrara.fitify.admin.internal.service.AdminServiceImpl
 import com.nickdferrara.fitify.shared.BusinessRuleUpdatedEvent
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateClassRequest
 import com.nickdferrara.fitify.admin.internal.dtos.request.CreateRecurringScheduleRequest
@@ -50,7 +51,7 @@ class AdminServiceTest {
     private val recurringScheduleRepository = mockk<RecurringScheduleRepository>()
     private val businessRuleRepository = mockk<BusinessRuleRepository>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
-    private val service = AdminService(
+    private val service = AdminServiceImpl(
         schedulingApi, coachingApi, locationApi, recurringScheduleRepository,
         businessRuleRepository, eventPublisher,
     )

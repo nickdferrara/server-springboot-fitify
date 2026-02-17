@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.subscription.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
-import com.nickdferrara.fitify.subscription.internal.service.SubscriptionService
+import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

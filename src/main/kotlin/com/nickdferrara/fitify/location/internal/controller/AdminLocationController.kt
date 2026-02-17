@@ -3,7 +3,7 @@ package com.nickdferrara.fitify.location.internal.controller
 import com.nickdferrara.fitify.location.internal.dtos.request.CreateLocationRequest
 import com.nickdferrara.fitify.location.internal.dtos.request.UpdateLocationRequest
 import com.nickdferrara.fitify.location.internal.dtos.response.LocationResponse
-import com.nickdferrara.fitify.location.internal.service.LocationService
+import com.nickdferrara.fitify.location.internal.service.interfaces.LocationService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -37,7 +37,7 @@ internal class AdminLocationController(
     }
 
     @GetMapping("/{locationId}")
-    fun getLocation(@PathVariable locationId: UUID): ResponseEntity<LocationResponse> {
+    fun findLocation(@PathVariable locationId: UUID): ResponseEntity<LocationResponse> {
         return ResponseEntity.ok(locationService.findById(locationId))
     }
 

@@ -5,7 +5,7 @@ import com.nickdferrara.fitify.identity.UserRegisteredEvent
 import com.nickdferrara.fitify.location.LocationDeactivatedEvent
 import com.nickdferrara.fitify.location.LocationUpdatedEvent
 import com.nickdferrara.fitify.notification.internal.factory.NotificationPayloadFactory
-import com.nickdferrara.fitify.notification.internal.service.NotificationService
+import com.nickdferrara.fitify.notification.internal.service.interfaces.NotificationService
 import com.nickdferrara.fitify.scheduling.BookingCancelledEvent
 import com.nickdferrara.fitify.scheduling.ClassBookedEvent
 import com.nickdferrara.fitify.scheduling.ClassFullEvent

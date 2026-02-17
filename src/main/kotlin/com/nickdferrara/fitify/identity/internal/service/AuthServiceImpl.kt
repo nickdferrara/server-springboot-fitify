@@ -28,13 +28,13 @@ import java.time.temporal.ChronoUnit
 import java.util.Base64
 
 @Service
-internal class AuthService(
+internal class AuthServiceImpl(
     private val userRepository: UserRepository,
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val identityProvider: IdentityProviderGateway,
     private val eventPublisher: ApplicationEventPublisher,
     @Value("\${fitify.security.token-pepper}") private val tokenPepper: String,
-) {
+) : com.nickdferrara.fitify.identity.internal.service.interfaces.AuthService {
 
     companion object {
         private val PASSWORD_PATTERN = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$")
@@ -42,7 +42,7 @@ internal class AuthService(
     }
 
     @Transactional
-    fun register(request: RegisterRequest): RegisterResponse {
+    override fun register(request: RegisterRequest): RegisterResponse {
         validatePassword(request.password)
 
         if (userRepository.existsByEmail(request.email)) {
@@ -82,7 +82,7 @@ internal class AuthService(
     }
 
     @Transactional
-    fun forgotPassword(request: ForgotPasswordRequest): MessageResponse {
+    override fun forgotPassword(request: ForgotPasswordRequest): MessageResponse {
         val user = userRepository.findByEmail(request.email).orElse(null)
             ?: return MessageResponse("If an account exists with that email, a reset link has been sent.")
 
@@ -120,7 +120,7 @@ internal class AuthService(
     }
 
     @Transactional
-    fun resetPassword(request: ResetPasswordRequest): MessageResponse {
+    override fun resetPassword(request: ResetPasswordRequest): MessageResponse {
         validatePassword(request.newPassword)
 
         val tokenHash = hashToken(request.token)

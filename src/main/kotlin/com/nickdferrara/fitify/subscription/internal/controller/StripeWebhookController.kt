@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.subscription.internal.controller
 
 import com.nickdferrara.fitify.subscription.internal.config.StripeProperties
 import com.nickdferrara.fitify.subscription.internal.exception.InvalidWebhookSignatureException
-import com.nickdferrara.fitify.subscription.internal.service.SubscriptionService
+import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService
 import com.stripe.model.Event
 import com.stripe.model.Invoice
 import com.stripe.net.Webhook

@@ -6,7 +6,7 @@ import com.nickdferrara.fitify.notification.internal.entities.NotificationChanne
 import com.nickdferrara.fitify.notification.internal.factory.NotificationPayload
 import com.nickdferrara.fitify.notification.internal.factory.NotificationPayloadFactory
 import com.nickdferrara.fitify.notification.internal.listener.NotificationEventListener
-import com.nickdferrara.fitify.notification.internal.service.NotificationService
+import com.nickdferrara.fitify.notification.internal.service.interfaces.NotificationService
 import com.nickdferrara.fitify.scheduling.BookingCancelledEvent
 import com.nickdferrara.fitify.scheduling.ClassBookedEvent
 import com.nickdferrara.fitify.scheduling.ClassFullEvent

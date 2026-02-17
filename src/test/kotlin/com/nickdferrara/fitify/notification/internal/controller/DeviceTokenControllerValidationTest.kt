@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.notification.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
-import com.nickdferrara.fitify.notification.internal.service.NotificationService
+import com.nickdferrara.fitify.notification.internal.service.interfaces.NotificationService
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

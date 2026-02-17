@@ -4,7 +4,7 @@ import com.nickdferrara.fitify.coaching.internal.dtos.request.AssignCoachLocatio
 import com.nickdferrara.fitify.coaching.internal.dtos.request.CreateCoachRequest
 import com.nickdferrara.fitify.coaching.internal.dtos.request.UpdateCoachRequest
 import com.nickdferrara.fitify.coaching.internal.dtos.response.CoachResponse
-import com.nickdferrara.fitify.coaching.internal.service.CoachingService
+import com.nickdferrara.fitify.coaching.internal.service.interfaces.CoachingService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

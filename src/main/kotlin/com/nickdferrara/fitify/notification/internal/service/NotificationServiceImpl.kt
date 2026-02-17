@@ -2,7 +2,6 @@ package com.nickdferrara.fitify.notification.internal.service
 
 import com.nickdferrara.fitify.notification.internal.adapter.interfaces.NotificationChannelSender
 import com.nickdferrara.fitify.notification.internal.factory.NotificationPayload
-import com.nickdferrara.fitify.notification.internal.factory.NotificationPayloadFactory
 import com.nickdferrara.fitify.notification.NotificationApi
 import com.nickdferrara.fitify.notification.NotificationFailedEvent
 import com.nickdferrara.fitify.notification.NotificationSentEvent
@@ -20,18 +19,17 @@ import java.time.Instant
 import java.util.UUID
 
 @Service
-internal class NotificationService(
+internal class NotificationServiceImpl(
     private val notificationLogRepository: NotificationLogRepository,
     private val deviceTokenRepository: DeviceTokenRepository,
     private val channelSenders: List<NotificationChannelSender>,
-    private val payloadFactory: NotificationPayloadFactory,
     private val eventPublisher: ApplicationEventPublisher,
-) : NotificationApi {
+) : com.nickdferrara.fitify.notification.internal.service.interfaces.NotificationService, NotificationApi {
 
-    private val logger = LoggerFactory.getLogger(NotificationService::class.java)
+    private val logger = LoggerFactory.getLogger(NotificationServiceImpl::class.java)
 
     @Async("notificationExecutor")
-    fun sendNotification(userId: UUID, eventType: String, payload: NotificationPayload) {
+    override fun sendNotification(userId: UUID, eventType: String, payload: NotificationPayload) {
         for (channel in payload.channels) {
             val sender = channelSenders.find { it.supports(channel) }
             if (sender == null) {
@@ -97,6 +95,6 @@ internal class NotificationService(
         deviceTokenRepository.delete(deviceToken)
     }
 
-    fun getNotificationHistory(userId: UUID) =
+    override fun getNotificationHistory(userId: UUID) =
         notificationLogRepository.findByUserId(userId)
 }

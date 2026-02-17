@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.logging.internal.controller
 
 import com.nickdferrara.fitify.logging.AuditLogResponse
-import com.nickdferrara.fitify.logging.internal.service.AuditLogService
+import com.nickdferrara.fitify.logging.internal.service.interfaces.AuditLogService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

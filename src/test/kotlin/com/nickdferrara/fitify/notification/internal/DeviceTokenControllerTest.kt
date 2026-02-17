@@ -6,7 +6,7 @@ import com.nickdferrara.fitify.notification.internal.entities.NotificationChanne
 import com.nickdferrara.fitify.notification.internal.entities.NotificationLog
 import com.nickdferrara.fitify.notification.internal.entities.NotificationStatus
 import com.nickdferrara.fitify.notification.internal.exception.DeviceTokenNotFoundException
-import com.nickdferrara.fitify.notification.internal.service.NotificationService
+import com.nickdferrara.fitify.notification.internal.service.interfaces.NotificationService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

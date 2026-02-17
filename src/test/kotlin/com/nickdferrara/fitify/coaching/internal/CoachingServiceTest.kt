@@ -12,7 +12,7 @@ import com.nickdferrara.fitify.coaching.internal.entities.CoachCertification
 import com.nickdferrara.fitify.coaching.internal.entities.CoachLocation
 import com.nickdferrara.fitify.coaching.internal.repository.CoachRepository
 import com.nickdferrara.fitify.coaching.internal.service.CoachNotFoundException
-import com.nickdferrara.fitify.coaching.internal.service.CoachingService
+import com.nickdferrara.fitify.coaching.internal.service.CoachingServiceImpl
 import com.nickdferrara.fitify.shared.NotFoundError
 import com.nickdferrara.fitify.shared.Result
 import io.mockk.every
@@ -35,7 +35,7 @@ class CoachingServiceTest {
 
     private val coachRepository = mockk<CoachRepository>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
-    private val coachingService = CoachingService(coachRepository, eventPublisher)
+    private val coachingService = CoachingServiceImpl(coachRepository, eventPublisher)
 
     private fun buildCoach(
         id: UUID = UUID.randomUUID(),

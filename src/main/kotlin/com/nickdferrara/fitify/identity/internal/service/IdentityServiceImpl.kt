@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-internal class IdentityService(
+internal class IdentityServiceImpl(
     private val userRepository: UserRepository,
-) : IdentityApi {
+) : com.nickdferrara.fitify.identity.internal.service.interfaces.IdentityService, IdentityApi {
 
     override fun findUserById(id: UUID): Result<IdentityUserSummary, DomainError> {
         val user = userRepository.findById(id).orElse(null)
@@ -32,14 +32,14 @@ internal class IdentityService(
         return Result.Success(user.toSummary())
     }
 
-    fun getPreferences(keycloakId: String): UserPreferencesResponse {
+    override fun getPreferences(keycloakId: String): UserPreferencesResponse {
         val user = userRepository.findByKeycloakId(keycloakId)
             .orElseThrow { UserNotFoundException(keycloakId) }
         return user.toPreferencesResponse()
     }
 
     @Transactional
-    fun updatePreferences(keycloakId: String, request: UpdatePreferencesRequest): UserPreferencesResponse {
+    override fun updatePreferences(keycloakId: String, request: UpdatePreferencesRequest): UserPreferencesResponse {
         val user = userRepository.findByKeycloakId(keycloakId)
             .orElseThrow { UserNotFoundException(keycloakId) }
 

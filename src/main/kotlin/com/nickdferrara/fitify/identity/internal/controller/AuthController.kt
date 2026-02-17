@@ -5,7 +5,7 @@ import com.nickdferrara.fitify.identity.internal.dtos.request.RegisterRequest
 import com.nickdferrara.fitify.identity.internal.dtos.request.ResetPasswordRequest
 import com.nickdferrara.fitify.identity.internal.dtos.response.MessageResponse
 import com.nickdferrara.fitify.identity.internal.dtos.response.RegisterResponse
-import com.nickdferrara.fitify.identity.internal.service.AuthService
+import com.nickdferrara.fitify.identity.internal.service.interfaces.AuthService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

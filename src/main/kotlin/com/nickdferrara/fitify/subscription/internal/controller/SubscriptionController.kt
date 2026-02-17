@@ -6,7 +6,7 @@ import com.nickdferrara.fitify.subscription.internal.dtos.response.BillingPortal
 import com.nickdferrara.fitify.subscription.internal.dtos.response.CheckoutResponse
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionPlanResponse
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionResponse
-import com.nickdferrara.fitify.subscription.internal.service.SubscriptionService
+import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal

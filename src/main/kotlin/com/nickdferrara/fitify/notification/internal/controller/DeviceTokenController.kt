@@ -4,7 +4,7 @@ import com.nickdferrara.fitify.notification.internal.dtos.request.RegisterDevice
 import com.nickdferrara.fitify.notification.internal.dtos.response.DeviceTokenResponse
 import com.nickdferrara.fitify.notification.internal.dtos.response.NotificationLogResponse
 import com.nickdferrara.fitify.notification.internal.extensions.toResponse
-import com.nickdferrara.fitify.notification.internal.service.NotificationService
+import com.nickdferrara.fitify.notification.internal.service.interfaces.NotificationService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

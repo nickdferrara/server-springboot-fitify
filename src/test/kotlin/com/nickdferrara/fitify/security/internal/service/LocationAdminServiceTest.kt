@@ -21,7 +21,7 @@ import java.util.UUID
 class LocationAdminServiceTest {
 
     private val repository = mockk<LocationAdminAssignmentRepository>()
-    private val service = LocationAdminService(repository)
+    private val service = LocationAdminServiceImpl(repository)
 
     private val locationId = UUID.randomUUID()
     private val keycloakId = UUID.randomUUID().toString()

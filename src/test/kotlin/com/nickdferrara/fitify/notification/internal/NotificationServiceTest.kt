@@ -13,7 +13,7 @@ import com.nickdferrara.fitify.notification.internal.repository.NotificationLogR
 import com.nickdferrara.fitify.notification.internal.adapter.interfaces.NotificationChannelSender
 import com.nickdferrara.fitify.notification.internal.factory.NotificationPayload
 import com.nickdferrara.fitify.notification.internal.factory.NotificationPayloadFactory
-import com.nickdferrara.fitify.notification.internal.service.NotificationService
+import com.nickdferrara.fitify.notification.internal.service.NotificationServiceImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -34,7 +34,7 @@ class NotificationServiceTest {
     private val payloadFactory = mockk<NotificationPayloadFactory>()
     private val eventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
 
-    private val service = NotificationService(
+    private val service = NotificationServiceImpl(
         notificationLogRepository,
         deviceTokenRepository,
         listOf(emailSender, pushSender),

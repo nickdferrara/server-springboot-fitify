@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service("locationAdminService")
-internal class LocationAdminService(
+internal class LocationAdminServiceImpl(
     private val repository: LocationAdminAssignmentRepository,
-) : SecurityApi {
+) : com.nickdferrara.fitify.security.internal.service.interfaces.LocationAdminService, SecurityApi {
 
-    fun hasAccess(authentication: Authentication, locationId: UUID): Boolean {
+    override fun hasAccess(authentication: Authentication, locationId: UUID): Boolean {
         val authorities = authentication.authorities.map { it.authority }
 
         if (authorities.contains("ROLE_ADMIN")) return true
@@ -39,7 +39,7 @@ internal class LocationAdminService(
     }
 
     @Transactional
-    fun assignLocationAdmin(keycloakId: String, locationId: UUID): LocationAdminAssignmentResponse {
+    override fun assignLocationAdmin(keycloakId: String, locationId: UUID): LocationAdminAssignmentResponse {
         if (repository.existsByKeycloakIdAndLocationId(keycloakId, locationId)) {
             throw AssignmentAlreadyExistsException(keycloakId, locationId)
         }
@@ -54,12 +54,12 @@ internal class LocationAdminService(
         return assignment.toResponse()
     }
 
-    fun getAssignments(keycloakId: String): List<LocationAdminAssignmentResponse> {
+    override fun getAssignments(keycloakId: String): List<LocationAdminAssignmentResponse> {
         return repository.findByKeycloakId(keycloakId).map { it.toResponse() }
     }
 
     @Transactional
-    fun removeAssignment(keycloakId: String, locationId: UUID) {
+    override fun removeAssignment(keycloakId: String, locationId: UUID) {
         if (!repository.existsByKeycloakIdAndLocationId(keycloakId, locationId)) {
             throw AssignmentNotFoundException(keycloakId, locationId)
         }

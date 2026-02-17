@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.admin.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
-import com.nickdferrara.fitify.admin.internal.AdminService
+import com.nickdferrara.fitify.admin.internal.service.interfaces.AdminService
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

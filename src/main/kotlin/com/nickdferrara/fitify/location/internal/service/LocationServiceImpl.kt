@@ -22,10 +22,10 @@ import java.time.Instant
 import java.util.UUID
 
 @Service
-internal class LocationService(
+internal class LocationServiceImpl(
     private val locationRepository: LocationRepository,
     private val eventPublisher: ApplicationEventPublisher,
-) : LocationApi {
+) : com.nickdferrara.fitify.location.internal.service.interfaces.LocationService, LocationApi {
 
     override fun findLocationById(id: UUID): Result<LocationSummary, DomainError> {
         val location = locationRepository.findById(id).orElse(null)
@@ -37,22 +37,22 @@ internal class LocationService(
         return locationRepository.findByActiveTrue().map { it.toSummary() }
     }
 
-    fun findAll(): List<LocationResponse> {
+    override fun findAll(): List<LocationResponse> {
         return locationRepository.findAll().map { it.toResponse() }
     }
 
-    fun findAllActive(): List<LocationResponse> {
+    override fun findAllActive(): List<LocationResponse> {
         return locationRepository.findByActiveTrue().map { it.toResponse() }
     }
 
-    fun findById(id: UUID): LocationResponse {
+    override fun findById(id: UUID): LocationResponse {
         val location = locationRepository.findById(id)
             .orElseThrow { LocationNotFoundException(id) }
         return location.toResponse()
     }
 
     @Transactional
-    fun createLocation(request: CreateLocationRequest): LocationResponse {
+    override fun createLocation(request: CreateLocationRequest): LocationResponse {
         val location = Location(
             name = request.name,
             address = request.address,
@@ -90,7 +90,7 @@ internal class LocationService(
     }
 
     @Transactional
-    fun updateLocation(id: UUID, request: UpdateLocationRequest): LocationResponse {
+    override fun updateLocation(id: UUID, request: UpdateLocationRequest): LocationResponse {
         val location = locationRepository.findById(id)
             .orElseThrow { LocationNotFoundException(id) }
 
@@ -135,7 +135,7 @@ internal class LocationService(
     }
 
     @Transactional
-    fun deactivateLocation(id: UUID) {
+    override fun deactivateLocation(id: UUID) {
         val location = locationRepository.findById(id)
             .orElseThrow { LocationNotFoundException(id) }
 

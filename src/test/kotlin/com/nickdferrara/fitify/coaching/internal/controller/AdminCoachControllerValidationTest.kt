@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.coaching.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
-import com.nickdferrara.fitify.coaching.internal.service.CoachingService
+import com.nickdferrara.fitify.coaching.internal.service.interfaces.CoachingService
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
