@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @Service
@@ -122,22 +123,41 @@ internal class SubscriptionServiceImpl(
         val plan = subscriptionPlanRepository.findById(request.planId)
             .orElseThrow { SubscriptionPlanNotFoundException("Plan not found: ${request.planId}") }
 
+        val subscriptionMonths = calculateSubscriptionMonths(userId)
+        val discountContext = DiscountContext(
+            userId = userId,
+            planType = plan.planType,
+            basePrice = plan.basePrice,
+            promotionalCode = request.promotionalCode,
+            subscriptionMonths = subscriptionMonths,
+        )
+        val discountAmount = discountStrategyResolver.resolveDiscount(discountContext)
+
         try {
-            val params = SessionCreateParams.builder()
+            val paramsBuilder = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
                 .setSuccessUrl(stripeProperties.successUrl)
                 .setCancelUrl(stripeProperties.cancelUrl)
                 .putMetadata("userId", userId.toString())
                 .putMetadata("planType", plan.planType.name)
+                .putMetadata("discountAmount", discountAmount.toPlainString())
                 .addLineItem(
                     SessionCreateParams.LineItem.builder()
                         .setPrice(plan.stripePriceId)
                         .setQuantity(1)
                         .build()
                 )
-                .build()
 
-            val session = Session.create(params)
+            if (discountAmount > BigDecimal.ZERO) {
+                val coupon = createStripeCoupon(discountAmount)
+                paramsBuilder.addDiscount(
+                    SessionCreateParams.Discount.builder()
+                        .setCoupon(coupon.id)
+                        .build()
+                )
+            }
+
+            val session = Session.create(paramsBuilder.build())
             return CheckoutResponse(
                 sessionId = session.id,
                 url = session.url,
@@ -343,6 +363,22 @@ internal class SubscriptionServiceImpl(
             PlanType.MONTHLY -> monthlyLifecycle
             PlanType.ANNUAL -> annualLifecycle
         }
+    }
+
+    private fun calculateSubscriptionMonths(userId: UUID): Long {
+        val subscriptions = subscriptionRepository.findByUserId(userId)
+        val earliest = subscriptions.mapNotNull { it.createdAt }.minOrNull() ?: return 0
+        return ChronoUnit.MONTHS.between(earliest, Instant.now())
+    }
+
+    private fun createStripeCoupon(amount: BigDecimal): com.stripe.model.Coupon {
+        val cents = amount.movePointRight(2).toLong()
+        val params = com.stripe.param.CouponCreateParams.builder()
+            .setAmountOff(cents)
+            .setCurrency("usd")
+            .setDuration(com.stripe.param.CouponCreateParams.Duration.ONCE)
+            .build()
+        return com.stripe.model.Coupon.create(params)
     }
 
     private fun Subscription.toSummary() = SubscriptionSummary(
