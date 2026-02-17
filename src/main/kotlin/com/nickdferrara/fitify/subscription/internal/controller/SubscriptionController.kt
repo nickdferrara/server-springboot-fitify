@@ -6,7 +6,7 @@ import com.nickdferrara.fitify.subscription.internal.dtos.response.BillingPortal
 import com.nickdferrara.fitify.subscription.internal.dtos.response.CheckoutResponse
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionPlanResponse
 import com.nickdferrara.fitify.subscription.internal.dtos.response.SubscriptionResponse
-import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService
+import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionCommandService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -21,12 +21,12 @@ import java.util.UUID
 @RestController
 @RequestMapping("/api/v1/subscriptions")
 internal class SubscriptionController(
-    private val subscriptionService: SubscriptionService,
+    private val subscriptionCommandService: SubscriptionCommandService,
 ) {
 
     @GetMapping("/plans")
     fun getAvailablePlans(): ResponseEntity<List<SubscriptionPlanResponse>> {
-        return ResponseEntity.ok(subscriptionService.getAvailablePlans())
+        return ResponseEntity.ok(subscriptionCommandService.getAvailablePlans())
     }
 
     @PostMapping("/checkout")
@@ -35,7 +35,7 @@ internal class SubscriptionController(
         @Valid @RequestBody request: CheckoutRequest,
     ): ResponseEntity<CheckoutResponse> {
         val userId = UUID.fromString(jwt.subject)
-        return ResponseEntity.ok(subscriptionService.createCheckoutSession(userId, request))
+        return ResponseEntity.ok(subscriptionCommandService.createCheckoutSession(userId, request))
     }
 
     @GetMapping("/me")
@@ -43,7 +43,7 @@ internal class SubscriptionController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SubscriptionResponse> {
         val userId = UUID.fromString(jwt.subject)
-        return ResponseEntity.ok(subscriptionService.getCurrentSubscription(userId))
+        return ResponseEntity.ok(subscriptionCommandService.getCurrentSubscription(userId))
     }
 
     @PostMapping("/me/cancel")
@@ -51,7 +51,7 @@ internal class SubscriptionController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<SubscriptionResponse> {
         val userId = UUID.fromString(jwt.subject)
-        return ResponseEntity.ok(subscriptionService.cancelSubscription(userId))
+        return ResponseEntity.ok(subscriptionCommandService.cancelSubscription(userId))
     }
 
     @PostMapping("/me/change-plan")
@@ -60,7 +60,7 @@ internal class SubscriptionController(
         @Valid @RequestBody request: ChangePlanRequest,
     ): ResponseEntity<CheckoutResponse> {
         val userId = UUID.fromString(jwt.subject)
-        return ResponseEntity.ok(subscriptionService.changePlan(userId, request))
+        return ResponseEntity.ok(subscriptionCommandService.changePlan(userId, request))
     }
 
     @PostMapping("/me/billing-portal")
@@ -68,6 +68,6 @@ internal class SubscriptionController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<BillingPortalResponse> {
         val userId = UUID.fromString(jwt.subject)
-        return ResponseEntity.ok(subscriptionService.createBillingPortalSession(userId))
+        return ResponseEntity.ok(subscriptionCommandService.createBillingPortalSession(userId))
     }
 }
