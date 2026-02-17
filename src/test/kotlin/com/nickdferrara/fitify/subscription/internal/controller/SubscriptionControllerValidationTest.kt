@@ -1,7 +1,7 @@
 package com.nickdferrara.fitify.subscription.internal.controller
 
 import com.nickdferrara.fitify.TestSecurityConfig
-import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService
+import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionCommandService
 import com.ninjasquad.springmockk.MockkBean
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +22,7 @@ internal class SubscriptionControllerValidationTest {
     lateinit var mockMvc: MockMvc
 
     @MockkBean
-    lateinit var subscriptionService: SubscriptionService
+    lateinit var subscriptionCommandService: SubscriptionCommandService
 
     @Test
     fun `checkout with invalid planId returns 400`() {

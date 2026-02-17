@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.subscription.internal.controller
 
 import com.nickdferrara.fitify.subscription.internal.config.StripeProperties
 import com.nickdferrara.fitify.subscription.internal.exception.InvalidWebhookSignatureException
-import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService
+import com.nickdferrara.fitify.subscription.internal.service.interfaces.StripeWebhookHandler
 import com.stripe.model.Event
 import com.stripe.model.EventDataObjectDeserializer
 import com.stripe.model.Invoice
@@ -22,14 +22,14 @@ import java.util.Optional
 
 internal class StripeWebhookControllerTest {
 
-    private val subscriptionService = mockk<SubscriptionService>(relaxed = true)
+    private val stripeWebhookHandler = mockk<StripeWebhookHandler>(relaxed = true)
     private val stripeProperties = StripeProperties(
         secretKey = "sk_test",
         webhookSecret = "whsec_test",
         successUrl = "http://localhost/success",
         cancelUrl = "http://localhost/cancel",
     )
-    private val controller = StripeWebhookController(subscriptionService, stripeProperties)
+    private val controller = StripeWebhookController(stripeWebhookHandler, stripeProperties)
 
     @BeforeEach
     fun setUp() {
@@ -68,7 +68,7 @@ internal class StripeWebhookControllerTest {
 
         assertThat(response.statusCode.value()).isEqualTo(200)
         verify {
-            subscriptionService.handleSubscriptionCreated(
+            stripeWebhookHandler.handleSubscriptionCreated(
                 stripeSubscriptionId = "sub_123",
                 customerId = "cus_456",
                 metadata = mapOf("userId" to "user-1"),
@@ -90,7 +90,7 @@ internal class StripeWebhookControllerTest {
 
         assertThat(response.statusCode.value()).isEqualTo(200)
         verify {
-            subscriptionService.handleSubscriptionRenewed(
+            stripeWebhookHandler.handleSubscriptionRenewed(
                 stripeSubscriptionId = "sub_123",
                 amountPaid = 4999L,
                 paymentIntentId = "pi_789",
@@ -111,7 +111,7 @@ internal class StripeWebhookControllerTest {
 
         assertThat(response.statusCode.value()).isEqualTo(200)
         verify {
-            subscriptionService.handlePaymentFailed(
+            stripeWebhookHandler.handlePaymentFailed(
                 stripeSubscriptionId = "sub_123",
                 paymentIntentId = "pi_789",
             )
@@ -129,7 +129,7 @@ internal class StripeWebhookControllerTest {
         val response = controller.handleStripeWebhook("payload", "sig")
 
         assertThat(response.statusCode.value()).isEqualTo(200)
-        verify { subscriptionService.handleSubscriptionExpired("sub_123") }
+        verify { stripeWebhookHandler.handleSubscriptionExpired("sub_123") }
     }
 
     @Test
@@ -145,7 +145,7 @@ internal class StripeWebhookControllerTest {
 
         assertThat(response.statusCode.value()).isEqualTo(200)
         verify {
-            subscriptionService.handleSubscriptionRenewed(
+            stripeWebhookHandler.handleSubscriptionRenewed(
                 stripeSubscriptionId = "sub_123",
                 amountPaid = 0,
                 paymentIntentId = null,

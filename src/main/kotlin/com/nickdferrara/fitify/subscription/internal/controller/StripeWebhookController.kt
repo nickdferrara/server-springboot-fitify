@@ -2,7 +2,7 @@ package com.nickdferrara.fitify.subscription.internal.controller
 
 import com.nickdferrara.fitify.subscription.internal.config.StripeProperties
 import com.nickdferrara.fitify.subscription.internal.exception.InvalidWebhookSignatureException
-import com.nickdferrara.fitify.subscription.internal.service.interfaces.SubscriptionService
+import com.nickdferrara.fitify.subscription.internal.service.interfaces.StripeWebhookHandler
 import com.stripe.model.Event
 import com.stripe.model.Invoice
 import com.stripe.net.Webhook
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/webhooks")
 internal class StripeWebhookController(
-    private val subscriptionService: SubscriptionService,
+    private val stripeWebhookHandler: StripeWebhookHandler,
     private val stripeProperties: StripeProperties,
 ) {
 
@@ -40,7 +40,7 @@ internal class StripeWebhookController(
             "customer.subscription.created" -> {
                 val stripeObject = event.dataObjectDeserializer.`object`.orElse(null)
                 if (stripeObject is com.stripe.model.Subscription) {
-                    subscriptionService.handleSubscriptionCreated(
+                    stripeWebhookHandler.handleSubscriptionCreated(
                         stripeSubscriptionId = stripeObject.id,
                         customerId = stripeObject.customer,
                         metadata = stripeObject.metadata ?: emptyMap(),
@@ -52,7 +52,7 @@ internal class StripeWebhookController(
                 if (stripeObject is Invoice) {
                     val subscriptionId = stripeObject.subscription
                     if (subscriptionId != null) {
-                        subscriptionService.handleSubscriptionRenewed(
+                        stripeWebhookHandler.handleSubscriptionRenewed(
                             stripeSubscriptionId = subscriptionId,
                             amountPaid = stripeObject.amountPaid,
                             paymentIntentId = stripeObject.paymentIntent,
@@ -65,7 +65,7 @@ internal class StripeWebhookController(
                 if (stripeObject is Invoice) {
                     val subscriptionId = stripeObject.subscription
                     if (subscriptionId != null) {
-                        subscriptionService.handlePaymentFailed(
+                        stripeWebhookHandler.handlePaymentFailed(
                             stripeSubscriptionId = subscriptionId,
                             paymentIntentId = stripeObject.paymentIntent,
                         )
@@ -75,14 +75,14 @@ internal class StripeWebhookController(
             "customer.subscription.deleted" -> {
                 val stripeObject = event.dataObjectDeserializer.`object`.orElse(null)
                 if (stripeObject is com.stripe.model.Subscription) {
-                    subscriptionService.handleSubscriptionExpired(stripeObject.id)
+                    stripeWebhookHandler.handleSubscriptionExpired(stripeObject.id)
                 }
             }
             "customer.subscription.updated" -> {
                 val stripeObject = event.dataObjectDeserializer.`object`.orElse(null)
                 if (stripeObject is com.stripe.model.Subscription) {
                     if (stripeObject.status == "active") {
-                        subscriptionService.handleSubscriptionRenewed(
+                        stripeWebhookHandler.handleSubscriptionRenewed(
                             stripeSubscriptionId = stripeObject.id,
                             amountPaid = 0,
                             paymentIntentId = null,
