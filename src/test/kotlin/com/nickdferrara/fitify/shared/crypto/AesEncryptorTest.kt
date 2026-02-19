@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.Base64
 
 class AesEncryptorTest {
@@ -99,9 +100,10 @@ class AesEncryptorTest {
     @Test
     fun `SIV rejects tampered ciphertext`() {
         val encrypted = encryptor.encryptDeterministic("test@example.com")
-        val decoded = Base64.getDecoder().decode(encrypted)
+        val base64Part = encrypted.removePrefix(AesEncryptor.VERSION_SIV)
+        val decoded = Base64.getDecoder().decode(base64Part)
         decoded[0] = (decoded[0].toInt() xor 0xFF).toByte()
-        val tampered = Base64.getEncoder().encodeToString(decoded)
+        val tampered = AesEncryptor.VERSION_SIV + Base64.getEncoder().encodeToString(decoded)
 
         assertFalse(encryptor.isSivEncrypted(tampered))
     }
@@ -110,8 +112,74 @@ class AesEncryptorTest {
     fun `SIV output includes 16-byte authentication tag`() {
         val plaintext = "test@example.com"
         val encrypted = encryptor.encryptDeterministic(plaintext)
-        val decoded = Base64.getDecoder().decode(encrypted)
+        val base64Part = encrypted.removePrefix(AesEncryptor.VERSION_SIV)
+        val decoded = Base64.getDecoder().decode(base64Part)
 
         assertEquals(plaintext.toByteArray(Charsets.UTF_8).size + 16, decoded.size)
+    }
+
+    @Test
+    fun `deterministic output starts with v1 prefix`() {
+        val encrypted = encryptor.encryptDeterministic("test@example.com")
+
+        assertTrue(encrypted.startsWith(AesEncryptor.VERSION_SIV))
+    }
+
+    @Test
+    fun `non-deterministic output starts with v2 prefix`() {
+        val encrypted = encryptor.encryptNonDeterministic("John")
+
+        assertTrue(encrypted.startsWith(AesEncryptor.VERSION_CBC))
+    }
+
+    @Test
+    fun `corrupted versioned SIV ciphertext throws`() {
+        val corrupted = AesEncryptor.VERSION_SIV + Base64.getEncoder().encodeToString(byteArrayOf(1, 2, 3, 4))
+
+        assertThrows<Exception> { encryptor.decrypt(corrupted) }
+    }
+
+    @Test
+    fun `corrupted versioned CBC ciphertext throws`() {
+        val corrupted = AesEncryptor.VERSION_CBC + Base64.getEncoder().encodeToString(byteArrayOf(1, 2, 3, 4))
+
+        assertThrows<Exception> { encryptor.decrypt(corrupted) }
+    }
+
+    @Test
+    fun `completely invalid ciphertext throws IllegalStateException`() {
+        // Not valid base64 for any cipher mode — will fail all legacy fallbacks
+        val invalid = Base64.getEncoder().encodeToString(byteArrayOf(0, 0, 0))
+
+        assertThrows<IllegalStateException> { encryptor.decrypt(invalid) }
+    }
+
+    @Test
+    fun `isVersioned returns true for v1 prefix`() {
+        val encrypted = encryptor.encryptDeterministic("test@example.com")
+
+        assertTrue(encryptor.isVersioned(encrypted))
+    }
+
+    @Test
+    fun `isVersioned returns true for v2 prefix`() {
+        val encrypted = encryptor.encryptNonDeterministic("John")
+
+        assertTrue(encryptor.isVersioned(encrypted))
+    }
+
+    @Test
+    fun `isVersioned returns false for legacy unversioned data`() {
+        val ecbEncrypted = encryptor.encryptEcbForTest("test@example.com")
+
+        assertFalse(encryptor.isVersioned(ecbEncrypted))
+    }
+
+    @Test
+    fun `legacy ECB throws when legacyEcbEnabled is false`() {
+        val encryptorNoEcb = AesEncryptor(EncryptionProperties(key, legacyEcbEnabled = false))
+        val ecbEncrypted = encryptor.encryptEcbForTest("test@example.com")
+
+        assertThrows<IllegalStateException> { encryptorNoEcb.decrypt(ecbEncrypted) }
     }
 }

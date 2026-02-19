@@ -4,6 +4,7 @@ import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.modes.GCMSIVBlockCipher
 import org.bouncycastle.crypto.params.AEADParameters
 import org.bouncycastle.crypto.params.KeyParameter
+import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component
 import java.security.SecureRandom
@@ -16,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec
 @Component
 @EnableConfigurationProperties(EncryptionProperties::class)
 class AesEncryptor(
-    properties: EncryptionProperties,
+    private val properties: EncryptionProperties,
 ) {
 
     private val secretKey: SecretKeySpec
@@ -39,7 +40,7 @@ class AesEncryptor(
         val output = ByteArray(cipher.getOutputSize(plaintextBytes.size))
         val len = cipher.processBytes(plaintextBytes, 0, plaintextBytes.size, output, 0)
         cipher.doFinal(output, len)
-        return Base64.getEncoder().encodeToString(output)
+        return VERSION_SIV + Base64.getEncoder().encodeToString(output)
     }
 
     fun encryptNonDeterministic(plaintext: String): String {
@@ -50,39 +51,59 @@ class AesEncryptor(
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
         val encrypted = cipher.doFinal(plaintext.toByteArray(Charsets.UTF_8))
         val combined = iv + encrypted
-        return Base64.getEncoder().encodeToString(combined)
+        return VERSION_CBC + Base64.getEncoder().encodeToString(combined)
     }
 
     fun decrypt(ciphertext: String): String {
         if (ciphertext.isBlank()) return ciphertext
+
+        if (ciphertext.startsWith(VERSION_SIV)) {
+            val decoded = Base64.getDecoder().decode(ciphertext.removePrefix(VERSION_SIV))
+            return decryptSiv(decoded)
+        }
+
+        if (ciphertext.startsWith(VERSION_CBC)) {
+            val decoded = Base64.getDecoder().decode(ciphertext.removePrefix(VERSION_CBC))
+            return decryptCbc(decoded)
+        }
+
+        // Legacy unversioned data — try SIV → CBC → ECB with fallback
         val decoded = Base64.getDecoder().decode(ciphertext)
 
-        // Try SIV first (auth tag rejects non-SIV data reliably)
         try {
             return decryptSiv(decoded)
         } catch (_: Exception) {}
 
-        // Then try CBC (IV + ciphertext, must be > 16 bytes and multiple of 16)
         if (decoded.size > 16 && decoded.size % 16 == 0) {
             try {
                 return decryptCbc(decoded)
             } catch (_: Exception) {}
         }
 
-        // Legacy ECB fallback
-        return decryptEcb(decoded)
+        if (properties.legacyEcbEnabled) {
+            try {
+                log.warn("Decrypting with deprecated ECB mode — run migration to upgrade this data")
+                return decryptEcb(decoded)
+            } catch (_: Exception) {}
+        }
+
+        throw IllegalStateException("Unable to decrypt ciphertext — data may be corrupted or key may be incorrect")
     }
 
     fun isSivEncrypted(ciphertext: String): Boolean {
         if (ciphertext.isBlank()) return false
         return try {
-            val decoded = Base64.getDecoder().decode(ciphertext)
+            val base64 = if (ciphertext.startsWith(VERSION_SIV)) ciphertext.removePrefix(VERSION_SIV) else ciphertext
+            val decoded = Base64.getDecoder().decode(base64)
             decryptSiv(decoded)
             true
         } catch (_: Exception) {
             false
         }
     }
+
+    fun isVersioned(ciphertext: String): Boolean =
+        ciphertext.startsWith(VERSION_SIV) || ciphertext.startsWith(VERSION_CBC)
 
     private fun decryptSiv(decoded: ByteArray): String {
         val cipher = GCMSIVBlockCipher(AESEngine.newInstance())
@@ -148,6 +169,9 @@ class AesEncryptor(
     }
 
     companion object {
+        private val log = LoggerFactory.getLogger(AesEncryptor::class.java)
         private val DETERMINISTIC_NONCE = ByteArray(12) // fixed zero nonce for deterministic encryption
+        const val VERSION_SIV = "v1$"
+        const val VERSION_CBC = "v2$"
     }
 }
