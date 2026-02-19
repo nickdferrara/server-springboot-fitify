@@ -45,6 +45,7 @@ management:
 fitify:
   encryption:
     key: ${ENCRYPTION_KEY:dGVzdC1rZXktMzItYnl0ZXMtbG9uZy4u}
+    run-migration: ${ENCRYPTION_RUN_MIGRATION:false}
   security:
     token-pepper: ${TOKEN_PEPPER:dev-pepper-value-change-in-prod}
   rate-limit:

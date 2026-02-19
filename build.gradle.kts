@@ -50,6 +50,9 @@ dependencies {
     // Stripe
     implementation("com.stripe:stripe-java:28.2.0")
 
+    // Crypto
+    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
+
     // AOP
     implementation("org.springframework.boot:spring-boot-starter-aop")
 
