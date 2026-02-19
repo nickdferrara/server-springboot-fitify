@@ -17,24 +17,29 @@ class EncryptionMigrationRunner(
 
     private val log = LoggerFactory.getLogger(EncryptionMigrationRunner::class.java)
 
-    private data class MigrationTarget(val table: String, val column: String)
+    private enum class EncryptionMode { DETERMINISTIC, NON_DETERMINISTIC }
+
+    private data class MigrationTarget(val table: String, val column: String, val mode: EncryptionMode)
 
     private val targets = listOf(
-        MigrationTarget("users", "email"),
-        MigrationTarget("locations", "email"),
+        MigrationTarget("users", "email", EncryptionMode.DETERMINISTIC),
+        MigrationTarget("users", "first_name", EncryptionMode.NON_DETERMINISTIC),
+        MigrationTarget("users", "last_name", EncryptionMode.NON_DETERMINISTIC),
+        MigrationTarget("locations", "email", EncryptionMode.DETERMINISTIC),
+        MigrationTarget("locations", "phone", EncryptionMode.NON_DETERMINISTIC),
     )
 
     override fun run(args: ApplicationArguments) {
-        log.info("Starting ECB → SIV encryption migration")
+        log.info("Starting encryption migration to versioned format")
         for (target in targets) {
-            migrateTable(target.table, target.column)
+            migrateTable(target)
         }
-        log.info("ECB → SIV encryption migration complete")
+        log.info("Encryption migration to versioned format complete")
     }
 
-    private fun migrateTable(table: String, column: String) {
+    private fun migrateTable(target: MigrationTarget) {
         val rows = jdbcTemplate.queryForList(
-            "SELECT id, $column FROM $table WHERE $column IS NOT NULL AND $column != ''",
+            "SELECT id, ${target.column} FROM ${target.table} WHERE ${target.column} IS NOT NULL AND ${target.column} != ''",
         )
 
         var migrated = 0
@@ -42,24 +47,27 @@ class EncryptionMigrationRunner(
 
         for (row in rows) {
             val id = row["id"] as UUID
-            val ciphertext = row[column] as String
+            val ciphertext = row[target.column] as String
 
-            if (encryptor.isSivEncrypted(ciphertext)) {
+            if (encryptor.isVersioned(ciphertext)) {
                 skipped++
                 continue
             }
 
             val plaintext = encryptor.decrypt(ciphertext)
-            val reEncrypted = encryptor.encryptDeterministic(plaintext)
+            val reEncrypted = when (target.mode) {
+                EncryptionMode.DETERMINISTIC -> encryptor.encryptDeterministic(plaintext)
+                EncryptionMode.NON_DETERMINISTIC -> encryptor.encryptNonDeterministic(plaintext)
+            }
 
             jdbcTemplate.update(
-                "UPDATE $table SET $column = ? WHERE id = ?",
+                "UPDATE ${target.table} SET ${target.column} = ? WHERE id = ?",
                 reEncrypted,
                 id,
             )
             migrated++
         }
 
-        log.info("Table '{}' column '{}': migrated={}, skipped={}", table, column, migrated, skipped)
+        log.info("Table '{}' column '{}': migrated={}, skipped={}", target.table, target.column, migrated, skipped)
     }
 }

@@ -6,4 +6,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class EncryptionProperties(
     val key: String,
     val runMigration: Boolean = false,
+    val legacyEcbEnabled: Boolean = true,
 )
