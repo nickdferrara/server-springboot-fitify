@@ -44,10 +44,10 @@ management:
 
 fitify:
   encryption:
-    key: ${ENCRYPTION_KEY:dGVzdC1rZXktMzItYnl0ZXMtbG9uZy4u}
+    key: ${ENCRYPTION_KEY}
     run-migration: ${ENCRYPTION_RUN_MIGRATION:false}
   security:
-    token-pepper: ${TOKEN_PEPPER:dev-pepper-value-change-in-prod}
+    token-pepper: ${TOKEN_PEPPER}
   rate-limit:
     auth-requests-per-minute: 5
     password-reset-per-hour: 3
@@ -66,10 +66,10 @@ fitify:
     server-url: ${FITIFY_KEYCLOAK_SERVER_URL:http://localhost:8180}
     realm: fitify
     client-id: fitify-api
-    client-secret: ${KEYCLOAK_CLIENT_SECRET:change-me}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET}
   stripe:
-    secret-key: ${STRIPE_SECRET_KEY:sk_test_placeholder}
-    webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_placeholder}
+    secret-key: ${STRIPE_SECRET_KEY}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET}
     success-url: ${STRIPE_SUCCESS_URL:http://localhost:3000/subscription/success}
     cancel-url: ${STRIPE_CANCEL_URL:http://localhost:3000/subscription/cancel}
   logging:

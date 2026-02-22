@@ -8,16 +8,16 @@ spring:
 
 fitify:
   encryption:
-    secret-key: "dGVzdC1lbmNyeXB0aW9uLWtleS0zMmI="
-
-stripe:
-  secret-key: "sk_test_dummy"
-  webhook-secret: "whsec_test_dummy"
-  success-url: "http://localhost:3000/success"
-  cancel-url: "http://localhost:3000/cancel"
-
-keycloak:
-  server-url: "http://localhost:8080"
-  realm: "fitify-test"
-  client-id: "fitify-api"
-  client-secret: "test-secret"
+    key: "dGVzdC1lbmNyeXB0aW9uLWtleS0zMmI="
+  security:
+    token-pepper: "test-pepper-value"
+  keycloak:
+    server-url: "http://localhost:8080"
+    realm: "fitify-test"
+    client-id: "fitify-api"
+    client-secret: "test-secret"
+  stripe:
+    secret-key: "sk_test_dummy"
+    webhook-secret: "whsec_test_dummy"
+    success-url: "http://localhost:3000/success"
+    cancel-url: "http://localhost:3000/cancel"
