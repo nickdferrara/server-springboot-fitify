@@ -6,3 +6,19 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+
+fitify:
+  encryption:
+    key: dGVzdC1rZXktMzItYnl0ZXMtbG9uZy4u
+  security:
+    token-pepper: test-pepper-value
+  keycloak:
+    server-url: http://localhost:8180
+    realm: fitify
+    client-id: fitify-api
+    client-secret: test-secret
+  stripe:
+    secret-key: sk_test_dummy
+    webhook-secret: whsec_test_dummy
+    success-url: http://localhost:3000/subscription/success
+    cancel-url: http://localhost:3000/subscription/cancel
