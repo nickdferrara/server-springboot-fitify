@@ -7,8 +7,8 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("prod")
-internal class ProductionConfigValidator(
+@Profile("!dev & !test")
+internal class SecretsValidator(
     private val environment: Environment,
 ) {
 
@@ -27,7 +27,7 @@ internal class ProductionConfigValidator(
         }
 
         val stripeSecretKey = environment.getProperty("fitify.stripe.secret-key", "")
-        if (stripeSecretKey.isBlank() || stripeSecretKey.contains("placeholder")) {
+        if (stripeSecretKey.isBlank() || stripeSecretKey.contains("placeholder") || stripeSecretKey.startsWith("sk_test_")) {
             errors.add("fitify.stripe.secret-key is blank or a placeholder — set your live Stripe secret key")
         }
 
@@ -37,13 +37,13 @@ internal class ProductionConfigValidator(
         }
 
         val keycloakSecret = environment.getProperty("fitify.keycloak.client-secret", "")
-        if (keycloakSecret == "change-me" || keycloakSecret == "fitify-dev-secret") {
+        if (keycloakSecret.isBlank() || keycloakSecret == "change-me" || keycloakSecret == "fitify-dev-secret") {
             errors.add("fitify.keycloak.client-secret is set to a dev default — use the secret from your Keycloak client")
         }
 
         if (errors.isNotEmpty()) {
             val message = buildString {
-                appendLine("Production configuration validation failed:")
+                appendLine("Secrets validation failed:")
                 errors.forEachIndexed { index, error ->
                     appendLine("  ${index + 1}. $error")
                 }
