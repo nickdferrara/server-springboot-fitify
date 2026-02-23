@@ -10,7 +10,6 @@ import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import io.mockk.mockk
 import io.mockk.verify
-import java.util.Base64
 
 class RateLimitFilterTest {
 
@@ -33,14 +32,6 @@ class RateLimitFilterTest {
         val request = MockHttpServletRequest(method, path)
         request.remoteAddr = ip
         return request
-    }
-
-    private fun addJwtHeader(request: MockHttpServletRequest, subject: String) {
-        val header = objectMapper.writeValueAsString(mapOf("alg" to "RS256"))
-        val payload = objectMapper.writeValueAsString(mapOf("sub" to subject))
-        val headerB64 = Base64.getUrlEncoder().withoutPadding().encodeToString(header.toByteArray())
-        val payloadB64 = Base64.getUrlEncoder().withoutPadding().encodeToString(payload.toByteArray())
-        request.addHeader("Authorization", "Bearer $headerB64.$payloadB64.signature")
     }
 
     @Test
@@ -132,19 +123,15 @@ class RateLimitFilterTest {
     }
 
     @Test
-    fun `admin endpoints use JWT subject for bucketing`() {
-        val subject = "user-123"
-
+    fun `admin endpoints use IP for bucketing`() {
         for (i in 1..200) {
             val request = createRequest("/api/v1/admin/locations", "GET")
-            addJwtHeader(request, subject)
             val response = MockHttpServletResponse()
             filter.doFilter(request, response, filterChain)
             assertEquals(HttpStatus.OK.value(), response.status)
         }
 
         val request = createRequest("/api/v1/admin/locations", "GET")
-        addJwtHeader(request, subject)
         val response = MockHttpServletResponse()
         filter.doFilter(request, response, filterChain)
         assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), response.status)
@@ -152,20 +139,47 @@ class RateLimitFilterTest {
 
     @Test
     fun `general endpoints are rate limited at 100 per minute`() {
-        val subject = "user-456"
-
         for (i in 1..100) {
             val request = createRequest("/api/v1/locations", "GET")
-            addJwtHeader(request, subject)
             val response = MockHttpServletResponse()
             filter.doFilter(request, response, filterChain)
             assertEquals(HttpStatus.OK.value(), response.status)
         }
 
         val request = createRequest("/api/v1/locations", "GET")
-        addJwtHeader(request, subject)
         val response = MockHttpServletResponse()
         filter.doFilter(request, response, filterChain)
         assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), response.status)
+    }
+
+    @Test
+    fun `forged JWT falls back to IP-based bucketing`() {
+        val forgedToken = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJmb3JnZWQtdXNlciJ9.fakesignature"
+
+        // Send request with forged JWT
+        val requestWithJwt = createRequest("/api/v1/locations", "GET", "192.168.1.1")
+        requestWithJwt.addHeader("Authorization", "Bearer $forgedToken")
+        val responseWithJwt = MockHttpServletResponse()
+        filter.doFilter(requestWithJwt, responseWithJwt, filterChain)
+        assertEquals(HttpStatus.OK.value(), responseWithJwt.status)
+
+        // Send request without JWT from same IP — should share the same bucket
+        val requestWithoutJwt = createRequest("/api/v1/locations", "GET", "192.168.1.1")
+        val responseWithoutJwt = MockHttpServletResponse()
+        filter.doFilter(requestWithoutJwt, responseWithoutJwt, filterChain)
+        assertEquals(HttpStatus.OK.value(), responseWithoutJwt.status)
+
+        // Exhaust remaining tokens (100 total, 2 used)
+        for (i in 3..100) {
+            val request = createRequest("/api/v1/locations", "GET", "192.168.1.1")
+            filter.doFilter(request, MockHttpServletResponse(), filterChain)
+        }
+
+        // Both forged-JWT and no-JWT requests from same IP should now be blocked
+        val blockedRequest = createRequest("/api/v1/locations", "GET", "192.168.1.1")
+        blockedRequest.addHeader("Authorization", "Bearer $forgedToken")
+        val blockedResponse = MockHttpServletResponse()
+        filter.doFilter(blockedRequest, blockedResponse, filterChain)
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), blockedResponse.status)
     }
 }
