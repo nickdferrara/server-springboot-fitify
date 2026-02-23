@@ -4,6 +4,10 @@ spring:
       ddl-auto: validate
     show-sql: false
 
+fitify:
+  cors:
+    allowed-origins: ${FITIFY_CORS_ALLOWED_ORIGINS}
+
 logging:
   level:
     com.nickdferrara.fitify: INFO

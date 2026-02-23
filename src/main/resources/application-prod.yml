@@ -4,6 +4,10 @@ spring:
       ddl-auto: none
     show-sql: false
 
+fitify:
+  cors:
+    allowed-origins: ${FITIFY_CORS_ALLOWED_ORIGINS}
+
 management:
   endpoint:
     health:
