@@ -15,7 +15,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.time.Duration
-import java.util.Base64
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
@@ -74,14 +73,8 @@ internal class RateLimitFilter(
         return when {
             path == "/api/v1/auth/forgot-password" && method == "POST" -> "pw-reset:$ip"
             path.startsWith("/api/v1/auth/") -> "auth:$ip"
-            path.startsWith("/api/v1/admin/") -> {
-                val subject = extractJwtSubject(request) ?: return "admin:$ip"
-                "admin:$subject"
-            }
-            path.startsWith("/api/v1/") -> {
-                val subject = extractJwtSubject(request) ?: return "general:$ip"
-                "general:$subject"
-            }
+            path.startsWith("/api/v1/admin/") -> "admin:$ip"
+            path.startsWith("/api/v1/") -> "general:$ip"
             else -> null
         }
     }
@@ -111,22 +104,6 @@ internal class RateLimitFilter(
         }
 
         return Bucket.builder().addLimit(bandwidth).build()
-    }
-
-    private fun extractJwtSubject(request: HttpServletRequest): String? {
-        val authHeader = request.getHeader("Authorization") ?: return null
-        if (!authHeader.startsWith("Bearer ")) return null
-
-        return try {
-            val token = authHeader.substring(7)
-            val parts = token.split(".")
-            if (parts.size != 3) return null
-            val payload = String(Base64.getUrlDecoder().decode(parts[1]), Charsets.UTF_8)
-            val json = objectMapper.readTree(payload)
-            json.get("sub")?.asText()
-        } catch (_: Exception) {
-            null
-        }
     }
 
     @Scheduled(fixedRate = 600_000)
