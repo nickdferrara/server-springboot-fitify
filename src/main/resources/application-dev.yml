@@ -10,6 +10,9 @@ spring:
       maximum-pool-size: 10
 
 fitify:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
   encryption:
     key: dGVzdC1rZXktMzItYnl0ZXMtbG9uZy4u
   security:
