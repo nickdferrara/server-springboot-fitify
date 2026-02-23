@@ -153,6 +153,69 @@ class RateLimitFilterTest {
     }
 
     @Test
+    fun `XFF header gives independent buckets for different clients behind same proxy`() {
+        val proxyIp = "10.0.0.99"
+
+        // Exhaust limit for client A (behind proxy)
+        for (i in 1..5) {
+            val request = createRequest("/api/v1/auth/login", "POST", proxyIp)
+            request.addHeader("X-Forwarded-For", "203.0.113.1")
+            val response = MockHttpServletResponse()
+            filter.doFilter(request, response, filterChain)
+            assertEquals(HttpStatus.OK.value(), response.status)
+        }
+
+        // Client A is now rate-limited
+        val limitedRequest = createRequest("/api/v1/auth/login", "POST", proxyIp)
+        limitedRequest.addHeader("X-Forwarded-For", "203.0.113.1")
+        val limitedResponse = MockHttpServletResponse()
+        filter.doFilter(limitedRequest, limitedResponse, filterChain)
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), limitedResponse.status)
+
+        // Client B (different XFF, same proxy) should still work
+        val freshRequest = createRequest("/api/v1/auth/login", "POST", proxyIp)
+        freshRequest.addHeader("X-Forwarded-For", "203.0.113.2")
+        val freshResponse = MockHttpServletResponse()
+        filter.doFilter(freshRequest, freshResponse, filterChain)
+        assertEquals(HttpStatus.OK.value(), freshResponse.status)
+    }
+
+    @Test
+    fun `absent XFF header falls back to remoteAddr`() {
+        // No XFF header — should use remoteAddr for bucketing
+        for (i in 1..5) {
+            val request = createRequest("/api/v1/auth/login", "POST", "192.168.0.10")
+            val response = MockHttpServletResponse()
+            filter.doFilter(request, response, filterChain)
+            assertEquals(HttpStatus.OK.value(), response.status)
+        }
+
+        val request = createRequest("/api/v1/auth/login", "POST", "192.168.0.10")
+        val response = MockHttpServletResponse()
+        filter.doFilter(request, response, filterChain)
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), response.status)
+    }
+
+    @Test
+    fun `multi-proxy XFF chain uses leftmost IP for bucketing`() {
+        // XFF with multiple proxies: "client, proxy1, proxy2"
+        for (i in 1..5) {
+            val request = createRequest("/api/v1/auth/login", "POST", "10.0.0.1")
+            request.addHeader("X-Forwarded-For", "198.51.100.7, 10.0.0.2, 10.0.0.3")
+            val response = MockHttpServletResponse()
+            filter.doFilter(request, response, filterChain)
+            assertEquals(HttpStatus.OK.value(), response.status)
+        }
+
+        // Same leftmost IP should be rate-limited
+        val limitedRequest = createRequest("/api/v1/auth/login", "POST", "10.0.0.1")
+        limitedRequest.addHeader("X-Forwarded-For", "198.51.100.7, 10.0.0.99")
+        val limitedResponse = MockHttpServletResponse()
+        filter.doFilter(limitedRequest, limitedResponse, filterChain)
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), limitedResponse.status)
+    }
+
+    @Test
     fun `forged JWT falls back to IP-based bucketing`() {
         val forgedToken = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJmb3JnZWQtdXNlciJ9.fakesignature"
 

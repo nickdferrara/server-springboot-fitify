@@ -67,8 +67,24 @@ internal class RateLimitFilter(
         return path.startsWith("/api/v1/webhooks/") || path.startsWith("/actuator/")
     }
 
+    /**
+     * Resolves the client IP from the `X-Forwarded-For` header (leftmost entry),
+     * falling back to [HttpServletRequest.getRemoteAddr].
+     *
+     * Production reverse proxies (nginx, ALB, Cloudflare) should strip or overwrite
+     * the `X-Forwarded-For` header from untrusted clients to prevent spoofing.
+     */
+    private fun resolveClientIp(request: HttpServletRequest): String {
+        return request.getHeader("X-Forwarded-For")
+            ?.split(",")
+            ?.firstOrNull()
+            ?.trim()
+            ?.ifEmpty { null }
+            ?: request.remoteAddr
+    }
+
     private fun resolveBucketKey(path: String, method: String, request: HttpServletRequest): String? {
-        val ip = request.remoteAddr
+        val ip = resolveClientIp(request)
 
         return when {
             path == "/api/v1/auth/forgot-password" && method == "POST" -> "pw-reset:$ip"
